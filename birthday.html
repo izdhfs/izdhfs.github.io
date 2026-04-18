@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Birthday</title>
+    <style>
+        body {
+            margin:0;
+            padding:0;
+            text-align:center;
+            font-family:Arial, sans-serif;
+            background:#f2f2f2;
+        }
+
+        h1 {
+            margin-top:40px;
+            font-size:40px;
+        }
+
+        /* 좌우 67 */
+        .side-number {
+            position:absolute;
+            top:150px;
+            font-size:180px;
+            font-weight:bold;
+        }
+
+        .left { left:80px; }
+        .right { right:80px; }
+
+        .input-area {
+            margin-top:120px;
+        }
+
+        input {
+            padding:10px;
+            font-size:20px;
+            width:120px;
+            text-align:center;
+            margin:5px;
+        }
+
+        /* 숫자 입력 화살표 제거 */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        button {
+            padding:10px 20px;
+            font-size:18px;
+            margin-top:10px;
+            cursor:pointer;
+        }
+
+        .result {
+            font-size:50px;
+            font-weight:bold;
+            margin-top:40px;
+        }
+
+        .home-btn {
+            margin-top:60px;
+            padding:12px 28px;
+            font-size:18px;
+            background:black;
+            color:white;
+            border:none;
+            cursor:pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>BIRTHDAY CHECKER</h1>
+
+    <div class="side-number left">67</div>
+    <div class="side-number right">67</div>
+
+    <div class="input-area">
+        <input type="number" id="monthInput" placeholder="Month (1-12)">
+        <input type="number" id="dayInput" placeholder="Day">
+        <br>
+        <button onclick="showBirthday()">CHECK</button>
+    </div>
+
+    <div id="result" class="result"></div>
+
+    <button class="home-btn" onclick="location.href='index.html'">
+        BACK TO HOME
+    </button>
+
+<script>
+function showBirthday() {
+    const monthNumber = parseInt(document.getElementById("monthInput").value);
+    const day = parseInt(document.getElementById("dayInput").value);
+    const result = document.getElementById("result");
+
+    if (isNaN(monthNumber) || isNaN(day)) {
+        result.innerText = "Please enter valid numbers!";
+        return;
+    }
+
+    const months = [
+        "", "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    ];
+
+    if (monthNumber < 1 || monthNumber > 12) {
+        result.innerText = "Invalid month!";
+        return;
+    }
+
+    const monthName = months[monthNumber];
+
+    // 날짜 접미사 결정
+    let suffix = "th";
+    if (day % 100 !== 11 && day % 10 === 1) suffix = "st";
+    else if (day % 100 !== 12 && day % 10 === 2) suffix = "nd";
+    else if (day % 100 !== 13 && day % 10 === 3) suffix = "rd";
+
+    result.innerText =
+        "Your birthday is " + monthName + " " + day + suffix + "!!";
+}
+</script>
+
+</body>
+</html>
