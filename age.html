@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>나이 맞추기</title>
+  <style>
+    body {
+      font-family: 'Malgun Gothic', sans-serif;
+      display: flex; flex-direction: column; align-items: center;
+      padding-top: 50px; margin: 0; background-color: white;
+    }
+
+    h1 {
+      width: 100%; max-width: 500px; text-align: left;
+      font-size: 2.5em; margin-bottom: 40px; padding-left: 20px;
+    }
+
+    .input-container {
+      display: flex; gap: 10px; width: 90%; max-width: 500px; margin-bottom: 50px;
+    }
+
+    .input-group {
+      position: relative; border: 1px solid #dadce0; border-radius: 12px;
+      padding: 15px 10px; flex: 1;
+    }
+
+    .input-group label {
+      position: absolute; top: -10px; left: 15px; background-color: white;
+      padding: 0 5px; font-size: 0.85em; color: #70757a;
+    }
+
+    select, input {
+      width: 100%; border: none; font-size: 1.2em; outline: none;
+      background: transparent; text-align: center;
+    }
+
+    .btn {
+      background-color: #3b4b9b; color: white; border: none;
+      border-radius: 6px; padding: 12px 30px; font-size: 1em;
+      font-weight: bold; cursor: pointer; margin-bottom: 20px;
+    }
+
+    /* 로딩 애니메이션 (빙글빙글) */
+    .loader {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #3b4b9b;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      display: none; /* 처음엔 숨김 */
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* 결과 확인 버튼 (나중에 나타남) */
+    #show-result-btn {
+      display: none;
+      background-color: #e51d20; /* 빨간색으로 포인트 */
+    }
+
+    #result-text {
+      font-size: 1.8em; font-weight: bold; color: #3b4b9b;
+      margin: 20px 0; display: none;
+      animation: bounce 0.5s ease; /* 짜잔 느낌 애니메이션 */
+    }
+
+    @keyframes bounce {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .btn-secondary { background-color: #3b4b9b; margin-top: 50px; }
+  </style>
+</head>
+<body>
+
+  <h1>나이 맞추기</h1>
+
+  <div class="input-container">
+    <div class="input-group" style="flex: 1.5;">
+      <label>Month</label>
+      <select id="month">
+        <option>1월</option><option>2월</option><option selected>3월</option>
+        <option>4월</option><option>5월</option><option>6월</option>
+        <option>7월</option><option>8월</option><option>9월</option>
+        <option>10월</option><option>11월</option><option>12월</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>Day</label>
+      <input type="number" value="13">
+    </div>
+    <div class="input-group">
+      <label>Year</label>
+      <input type="number" value="1945">
+    </div>
+  </div>
+
+  <button class="btn" id="start-btn" onclick="startLoading()">나이 맞추기</button>
+
+  <div id="loading-area" style="display: none;">
+    <div class="loader"></div>
+    <p>데이터를 분석하며 나이를 계산중입니다...</p>
+  </div>
+
+  <button class="btn" id="show-result-btn" onclick="revealResult()">✨ 결과 확인하기 ✨</button>
+
+  <div id="result-text">당신은 67세입니다!</div>
+
+  <button class="btn btn-secondary" onclick="history.back()">이전으로 돌아가기</button>
+
+  <script>
+    function startLoading() {
+      // 1. 첫 버튼 숨기기
+      document.getElementById('start-btn').style.display = 'none';
+      
+      // 2. 로딩 영역 보여주기
+      const loadingArea = document.getElementById('loading-area');
+      loadingArea.style.display = 'block';
+      loadingArea.querySelector('.loader').style.display = 'block';
+
+      // 3. 3초 뒤에 로딩 숨기고 '결과 확인하기' 버튼 보여주기
+      setTimeout(() => {
+        loadingArea.style.display = 'none';
+        document.getElementById('show-result-btn').style.display = 'inline-block';
+      }, 3000);
+    }
+
+    function revealResult() {
+      // 결과 보기 버튼 숨기고 결과 글자 짜잔!
+      document.getElementById('show-result-btn').style.display = 'none';
+      const resultText = document.getElementById('result-text');
+      resultText.style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>

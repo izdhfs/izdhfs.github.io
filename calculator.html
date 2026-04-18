@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>계산기</title>
+  <style>
+    body {
+      font-family: 'Malgun Gothic', sans-serif;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 30px 20px; margin: 0; background-color: white;
+    }
+
+    h1 {
+      width: 100%; max-width: 450px; text-align: left;
+      font-size: 2.5em; margin-bottom: 25px; font-weight: bold; padding-left: 10px;
+    }
+
+    .display-container {
+      position: relative; border: 2px solid #3b4b9b; border-radius: 15px;
+      width: 100%; max-width: 450px; padding: 30px 20px; margin-bottom: 25px;
+      box-sizing: border-box; text-align: right; min-height: 120px;
+      display: flex; align-items: center; justify-content: flex-end;
+    }
+
+    .display-container label {
+      position: absolute; top: -12px; left: 15px; background-color: white;
+      padding: 0 8px; font-size: 0.9em; color: #3b4b9b; font-weight: bold;
+    }
+
+    #result-text { font-size: 3.2em; font-weight: bold; color: #333; margin: 0; word-break: break-all; }
+
+    .calc-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      width: 100%; max-width: 450px; margin-bottom: 40px;
+    }
+
+    .btn {
+      background-color: #f8faff; color: #333; border: 1px solid #e0e6ed;
+      border-radius: 12px; padding: 20px 0; font-size: 1.3em; font-weight: bold;
+      cursor: pointer; display: flex; justify-content: center; align-items: center;
+    }
+
+    .btn-blue-text { color: #3b4b9b; }
+
+    .btn-equal { background-color: #3b4b9b; color: white; border: none; font-size: 2em; }
+
+    .btn-back {
+      background-color: #3b4b9b; color: white; border: none;
+      border-radius: 8px; padding: 15px 40px; font-size: 1.1em; cursor: pointer;
+    }
+
+    .btn:active { background-color: #e0e6ed; }
+    .btn-equal:active { background-color: #2a3a7a; }
+  </style>
+</head>
+<body>
+
+  <h1>계산기</h1>
+
+  <div class="display-container">
+    <label>Calculation Result</label>
+    <div id="result-text">0</div>
+  </div>
+
+  <div class="calc-grid">
+    <button class="btn btn-blue-text" onclick="clearDisplay()">C</button>
+    <button class="btn btn-blue-text" onclick="append('/')">÷</button>
+    <button class="btn btn-blue-text" onclick="append('*')">×</button>
+    <button class="btn btn-blue-text" onclick="backspace()">⌫</button>
+
+    <button class="btn" onclick="append('7')">7</button>
+    <button class="btn" onclick="append('8')">8</button>
+    <button class="btn" onclick="append('9')">9</button>
+    <button class="btn btn-blue-text" onclick="append('-')">-</button>
+
+    <button class="btn" onclick="append('4')">4</button>
+    <button class="btn" onclick="append('5')">5</button>
+    <button class="btn" onclick="append('6')">6</button>
+    <button class="btn btn-blue-text" onclick="append('+')">+</button>
+
+    <button class="btn" onclick="append('1')">1</button>
+    <button class="btn" onclick="append('2')">2</button>
+    <button class="btn" onclick="append('3')">3</button>
+    <button class="btn" onclick="append('.')">.</button>
+
+    <button class="btn">+/-</button>
+    <button class="btn" onclick="append('0')">0</button>
+    <button class="btn" onclick="append('%')">%</button>
+    <button class="btn btn-equal" onclick="calculate()">=</button>
+  </div>
+
+  <button class="btn-back" onclick="history.back()">이전으로 돌아가기</button>
+
+  <script>
+    let currentExp = '';
+
+    function append(char) {
+      if (currentExp === '0' && char !== '.') currentExp = '';
+      currentExp += char;
+      update();
+    }
+
+    function clearDisplay() {
+      currentExp = '0';
+      update();
+    }
+
+    function backspace() {
+      currentExp = currentExp.toString().slice(0, -1);
+      if (currentExp === '') currentExp = '0';
+      update();
+    }
+
+    function update() {
+      let viewText = currentExp.toString().replace(/\*/g, '×').replace(/\//g, '÷');
+      document.getElementById('result-text').innerText = viewText || '0';
+    }
+
+    function calculate() {
+      try {
+        let tempExp = currentExp.replace(/%/g, '/100');
+        let result = Function('"use strict";return (' + tempExp + ')')();
+        
+        // 소수점 3자리 반올림 후 불필요한 0 제거
+        result = Number(result.toFixed(3));
+
+        currentExp = result.toString();
+        update();
+      } catch {
+        document.getElementById('result-text').innerText = 'Error';
+        currentExp = '';
+      }
+    }
+  </script>
+</body>
+</html>

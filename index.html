@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>반응형 레이아웃 수정</title>
+  <style>
+    /* 1. 전체 화면 구조 (푸터 하단 고정) */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      text-align: center;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 상단 헤더 */
+    .header {
+      background-color: #3b4b9b;
+      color: white;
+      padding: 20px;
+      font-size: clamp(2em, 5vw, 3em); /* 화면 크기에 따라 폰트 조절 */
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* 모든 요소를 가로 가운데 정렬 */
+    }
+
+    /* 2. 이미지 설정 (무한정 커지는 것 방지) */
+    .image-container {
+      width: 100%;
+      max-width: 600px; /* ★ 사진이 이 너비(600px) 이상으로 안 커지게 제한 */
+      margin: 20px auto;
+    }
+
+    .responsive-image {
+      width: 100%;
+      height: auto;
+      border-radius: 8px; /* 살짝 부드럽게 (선택사항) */
+    }
+
+    /* 3. 버튼 그리드 설정 */
+    .button-grid {
+      width: 100%;
+      max-width: 800px; /* 버튼들이 너무 퍼지지 않게 제한 */
+      margin: 20px auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center; /* 버튼들을 가운데로 모음 */
+    }
+
+    .grid-button {
+      background-color: black;
+      color: white;
+      border: none;
+      padding: 15px 25px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .grid-button:hover {
+      transform: scale(1.05); /* 마우스 올리면 살짝 커짐 */
+    }
+
+    /* 하단 파란 바 */
+    .footer {
+      background-color: #3b4b9b;
+      height: 80px;
+      flex-shrink: 0;
+    }
+
+    /* ---------------------------------
+       [반응형] 화면이 커졌을 때 (태블릿/PC)
+       --------------------------------- */
+    @media (min-width: 768px) {
+      /* 큰 화면에서는 버튼 크기를 더 키우고 가로로 정렬 */
+      .grid-button {
+        flex: 0 1 180px; /* 버튼 하나당 최소 너비를 주고 적당히 커지게 */
+        padding: 20px 0;
+        font-size: 1.3em; /* 텍스트 크기 증가 */
+      }
+    }
+
+    /* ---------------------------------
+       [반응형] 핸드폰 화면 (모바일)
+       --------------------------------- */
+    @media (max-width: 767px) {
+      .button-grid {
+        display: flex;
+      }
+      .grid-button {
+        flex: 0 0 45%; /* 모바일에서는 2열로 배치 */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">izdhfs</div>
+
+  <div class="main-content">
+    
+    <div class="image-container">
+      <img src="holyimage.png" alt="멋있는 내 사진" class="responsive-image">
+    </div>
+
+<div class="button-grid">
+  <button class="grid-button" onclick="location.href='birthday.html'">생일 확인</button>
+  <button class="grid-button" onclick="location.href='calculator.html'">계산기</button>
+  <button class="grid-button" onclick="location.href='gallery.html'">사진들</button>
+  <button class="grid-button" onclick="location.href='age.html'">나이 맞추기</button>
+</div>
+
+  </div>
+
+  <div class="footer"></div>
+
+
+  <style>
+  /* ... 기존 상단 스타일 유지 ... */
+
+  /* 푸터를 감싸는 전체 컨테이너 */
+  .footer-wrapper {
+    width: 100%;
+    margin-top: auto;
+    position: relative; /* 버튼의 기준점 역할 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* 인스타그램 버튼: 위치를 완전히 자유롭게 고정 */
+  .insta-box {
+    position: absolute; /* 주변 요소 무시하고 배치 */
+    top: -20px;         /* 파란 바의 상단 경계선에 걸치게 위로 올림 */
+    background-color: white; 
+    border: 2px solid #3b4b9b;
+    color: #3b4b9b;
+    padding: 6px 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 999;       /* 어떤 요소보다도 위에 오도록 함 */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* 약간의 입체감으로 줄 가리기 */
+  }
+
+  /* 하단 파란색 바 */
+  .footer-bar {
+    background-color: #3b4b9b;
+    width: 100%;
+    height: 80px;
+    border: none;
+    margin: 0;
+    padding: 0;
+  }
+</style>
+
+<body>
+  <div class="footer-wrapper">
+    <a href="https://www.instagram.com/izdhf" target="_blank" class="insta-box">
+      izdhf instagram
+    </a>
+    
+    <div class="footer-bar"></div>
+  </div>
+</body>
+<style>
+  /* ... 기존 스타일 유지 ... */
+
+  /* [수정] 인스타그램 버튼 기본 스타일 */
+  .insta-box {
+    position: absolute;
+    top: -20px;
+    background-color: white; 
+    border: 2px solid #3b4b9b;
+    color: #3b4b9b;
+    padding: 6px 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 999;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+    /* [핵심] 부드러운 전환 효과 추가 (반짝거림을 위해) */
+    transition: all 0.3s ease; /* 0.3초 동안 모든 변화가 부드럽게 */
+    display: inline-block;
+    cursor: pointer;
+  }
+
+  /* [추가] 마우스 오버(Hover) 시 반짝거리는 효과 */
+  .insta-box:hover {
+    background-color: #3b4b9b; /* 배경색 파란색으로 변경 */
+    color: white;              /* 글자색 흰색으로 변경 */
+    transform: scale(1.1);     /* 버튼 크기 10% 확대 (짜잔!) */
+    box-shadow: 0 5px 15px rgba(59, 75, 155, 0.4); /* 그림자를 파란색으로 키워 번지는 느낌 생성 */
+  }
+</style>
+
+
+</body>
+</html>
