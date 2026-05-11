@@ -1,0 +1,126 @@
+/* ... 기존 스타일 유지 ... */
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial Black', sans-serif; }
+body { background-color: #000; color: #fff; overflow-x: hidden; min-height: 100vh; }
+#starfield { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: #000; }
+.star { position: absolute; background: white; border-radius: 50%; opacity: 0.15; transition: opacity 0.6s ease; }
+.star.bright { opacity: 1 !important; transform: scale(1.8); box-shadow: 0 0 8px #fff; }
+
+header { display: flex; justify-content: space-between; align-items: center; padding: 2.5rem 8%; z-index: 100; }
+.logo { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; }
+.main-nav { display: flex; gap: 30px; }
+.nav-item { color: #fff; text-decoration: none; font-size: 0.85rem; opacity: 0.5; transition: 0.3s; text-transform: uppercase; }
+.nav-item:hover, .nav-item.active { opacity: 1; }
+
+.content-container { padding: 4rem 15% 4rem; }
+.intro-section { text-align: center; margin-bottom: 5rem; }
+.title { font-size: 3.5rem; letter-spacing: 4px; margin-bottom: 1rem; }
+.subtitle { font-size: 1.1rem; opacity: 0.6; font-family: 'Arial', sans-serif; }
+
+.drive-container { background-color: rgba(255, 255, 255, 0.03); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden; margin-bottom: 6rem; }
+.drive-header, .drive-item { display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 15px 30px; align-items: center; }
+.drive-header { border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.75rem; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; }
+.drive-item { transition: 0.2s; cursor: pointer; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+.drive-item:hover { background-color: rgba(255, 255, 255, 0.07); }
+.col-name { font-family: 'Arial', sans-serif; font-size: 0.95rem; display: flex; align-items: center; gap: 12px; }
+
+/* --- 모달 스타일 추가 --- */
+.modal {
+    display: none; /* 기본 숨김 */
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* 배경 어둡게 */
+    backdrop-filter: blur(10px);
+}
+
+.modal-content {
+    background-color: #111;
+    margin: 5% auto;
+    padding: 40px;
+    border: 1px solid #333;
+    width: 60%;
+    max-width: 800px;
+    border-radius: 15px;
+    position: relative;
+    color: #fff;
+    animation: modalFade 0.4s ease;
+}
+
+@keyframes modalFade {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px; right: 30px;
+    font-size: 30px;
+    cursor: pointer;
+    color: #888;
+}
+
+.close-btn:hover { color: #fff; }
+
+#modalBody h2 { font-size: 2rem; margin-bottom: 20px; color: #fff; }
+#modalBody p { font-family: 'Arial', sans-serif; line-height: 1.8; opacity: 0.8; margin-bottom: 15px; }
+#modalBody img { width: 100%; border-radius: 8px; margin: 20px 0; }
+
+.back-btn { color: #fff; text-decoration: none; font-size: 0.8rem; opacity: 0.4; text-transform: uppercase; letter-spacing: 2px; padding: 10px 20px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px; transition: 0.3s; }
+.back-btn:hover { opacity: 1; border-color: #fff; background-color: rgba(255, 255, 255, 0.05); }
+
+@media (max-width: 768px) {
+    .modal-content { width: 90%; margin: 20% auto; padding: 20px; }
+    .drive-header { display: none; }
+    .drive-item { grid-template-columns: 1fr; gap: 8px; }
+}
+
+<style>
+    /* ... 앞부분 기본 스타일 동일 ... */
+
+    /* 헤더가 별보다 위에 오도록 수정 */
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2.5rem 8%;
+        position: relative;
+        z-index: 10; /* 별 배경(-1)보다 높게 설정 */
+    }
+
+    /* 제목 섹션도 별보다 위에 오도록 설정 */
+    .intro-section { 
+        text-align: center; 
+        margin-bottom: 5rem; 
+        position: relative;
+        z-index: 10;
+    }
+
+    /* --- 표(드라이브 컨테이너) 수정 핵심 부분 --- */
+    .drive-container {
+        background-color: #000; /* 투명도를 없애고 완전 검정 배경으로 설정 */
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+        margin-bottom: 6rem;
+        position: relative; /* 위치 기준점 설정 */
+        z-index: 20; /* 별 배경보다 훨씬 위로 올려서 별이 뒤로 가게 함 */
+        box-shadow: 0 0 30px rgba(0, 0, 0, 1); /* 주변에 그림자를 주어 경계 명확히 함 */
+    }
+
+    /* 표 내부 아이템 스타일 유지 */
+    .drive-header, .drive-item {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        padding: 15px 30px;
+        align-items: center;
+        background-color: #000; /* 각 행도 검정 배경 유지 */
+    }
+
+    .drive-item:hover { 
+        background-color: rgba(255, 255, 255, 0.07); 
+    }
+
+    /* ... 모달 및 나머지 스타일 동일 ... */
+</style>

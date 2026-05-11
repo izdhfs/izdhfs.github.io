@@ -1,0 +1,174 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial Black', sans-serif;
+}
+
+body {
+    background-color: #000;
+    color: #fff;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+#starfield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: #000;
+}
+
+.star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.15;
+    transition: opacity 0.6s ease;
+}
+
+.star.bright {
+    opacity: 1 !important;
+    transform: scale(1.8);
+    box-shadow: 0 0 8px #fff;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2.5rem 8%;
+    z-index: 100;
+}
+
+.logo { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; }
+.main-nav { display: flex; gap: 30px; }
+.nav-item {
+    color: #fff; text-decoration: none; font-size: 0.85rem;
+    opacity: 0.5; transition: 0.3s; text-transform: uppercase;
+}
+.nav-item:hover, .nav-item.active { opacity: 1; }
+.header-right { width: 1.2rem; }
+
+.content-container {
+    padding: 4rem 15% 4rem;
+}
+
+.intro-section {
+    text-align: center;
+    margin-bottom: 8rem;
+}
+
+.title {
+    font-size: 3.5rem;
+    letter-spacing: 4px;
+    margin-bottom: 1rem;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    opacity: 0.6;
+    font-family: 'Arial', sans-serif;
+    letter-spacing: 1px;
+}
+
+.milestone-list {
+    display: flex;
+    flex-direction: column;
+    gap: 120px;
+    margin-bottom: 8rem;
+}
+
+.milestone-item {
+    display: flex;
+    align-items: center;
+    gap: 80px;
+}
+
+/* 짝수 번째 아이템은 오른쪽에서 왼쪽으로 정렬 (지그재그) */
+.milestone-item:nth-child(even) {
+    flex-direction: row-reverse;
+}
+
+.milestone-image {
+    flex: 1.2;
+    height: 350px;
+    background-color: #111;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.milestone-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+    transition: 0.8s;
+}
+
+.milestone-item:hover .milestone-image img {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.milestone-text {
+    flex: 1;
+}
+
+.year {
+    font-family: 'Arial', sans-serif;
+    font-size: 0.8rem;
+    color: #fff;
+    opacity: 0.4;
+    letter-spacing: 2px;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.milestone-text h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+}
+
+.milestone-text p {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    opacity: 0.6;
+    font-family: 'Arial', sans-serif;
+    word-break: keep-all;
+}
+
+.page-footer {
+    text-align: center;
+    padding: 4rem 0;
+}
+
+.back-btn {
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.8rem;
+    opacity: 0.4;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 10px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.back-btn:hover {
+    opacity: 1;
+    border-color: #fff;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 1024px) {
+    .content-container { padding: 4rem 8% 4rem; }
+    .milestone-item, .milestone-item:nth-child(even) { flex-direction: column; gap: 30px; }
+    .milestone-image { width: 100%; height: 300px; }
+    .milestone-text { text-align: center; }
+}

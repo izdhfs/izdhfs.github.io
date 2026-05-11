@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Category - DoHyun Kim</title>
+    <style>
+        /* --- CSS 통합 --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* 별 배경 */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: #000;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.15;
+            transition: opacity 0.6s ease;
+        }
+
+        .star.bright {
+            opacity: 1 !important;
+            transform: scale(1.8);
+            box-shadow: 0 0 8px #fff;
+        }
+
+        /* 헤더 */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2.5rem 8%;
+            z-index: 100;
+        }
+
+        .logo { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; cursor: pointer; flex: 1; }
+        .main-nav { display: flex; gap: 30px; flex: 2; justify-content: center; }
+        .nav-item {
+            color: #fff; text-decoration: none; font-size: 0.85rem;
+            opacity: 0.5; transition: 0.3s; text-transform: uppercase;
+        }
+        .nav-item:hover { opacity: 1; }
+        .header-right { flex: 1; }
+
+        /* 선택 컨테이너 */
+        .select-page {
+            padding: 4rem 8% 8rem;
+            text-align: center;
+        }
+
+        .page-title { margin-bottom: 5rem; }
+        .page-title h2 { font-size: 2.8rem; letter-spacing: 3px; margin-bottom: 1.2rem; }
+        .page-title p { font-size: 1.1rem; opacity: 0.6; font-family: 'Arial', sans-serif; }
+
+        /* 카드 그리드 */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            justify-content: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .work-card {
+            cursor: pointer;
+            transition: transform 0.4s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .work-card:hover { transform: translateY(-15px); }
+
+        .image-holder {
+            width: 100%;
+            height: 480px;
+            background-color: #111;
+            overflow: hidden;
+            margin-bottom: 1.8rem;
+            border-radius: 4px;
+        }
+
+        .image-holder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+            filter: grayscale(100%);
+        }
+
+        .work-card:hover .image-holder img {
+            transform: scale(1.05);
+            filter: grayscale(0%);
+        }
+
+        .text-holder { text-align: left; padding: 0 10px; }
+        .text-holder h3 { font-size: 1.6rem; margin-bottom: 0.8rem; letter-spacing: 1px; }
+        .text-holder p { font-size: 0.9rem; line-height: 1.6; opacity: 0.6; font-family: 'Arial', sans-serif; }
+
+        @media (max-width: 1024px) {
+            .card-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+        }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 20px; }
+            .card-grid { grid-template-columns: 1fr; max-width: 450px; }
+            .image-holder { height: 350px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="starfield"></div>
+
+    <header>
+        <div class="logo" onclick="location.href='index.html'">IZDHFS</div>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-item">Home</a>
+            <a href="personal.html" class="nav-item">Personal</a>
+            <a href="academic.html" class="nav-item">Academic</a>
+            <a href="projects.html" class="nav-item">Projects</a>
+        </nav>
+        <div class="header-right"></div>
+    </header>
+
+    <main class="select-page">
+        <div class="page-title">
+            <h2>CHOOSE A CATEGORY</h2>
+            <p>Explore my journey through different perspectives.</p>
+        </div>
+
+        <div class="card-grid">
+            <a href="personal.html" class="work-card">
+                <div class="image-holder"><img src="personalthumbnail.jpg" alt="Personal"></div>
+                <div class="text-holder">
+                    <h3>PERSONAL</h3>
+                    <p>My hobbies, daily life, and the values I pursue as an individual.</p>
+                </div>
+            </a>
+
+            <a href="academic.html" class="work-card">
+                <div class="image-holder"><img src="academicthumbnail.jpg" alt="Academic"></div>
+                <div class="text-holder">
+                    <h3>ACADEMIC</h3>
+                    <p>School life, awards, and my passion for learning and growth.</p>
+                </div>
+            </a>
+
+            <a href="projects.html" class="work-card">
+                <div class="image-holder"><img src="projectsthumbnail.jpg" alt="Projects"></div>
+                <div class="text-holder">
+                    <h3>PROJECTS</h3>
+                    <p>Creative works, coding, and various challenges I've taken on.</p>
+                </div>
+            </a>
+        </div>
+    </main>
+
+    <script src="selectscript.js"></script>
+</body>
+</html>
