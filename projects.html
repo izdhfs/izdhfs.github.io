@@ -19,7 +19,7 @@
             min-height: 100vh;
         }
 
-        /* 별 배경: 레이어를 가장 뒤로 (-1) */
+        /* 기본 별 배경 */
         #starfield {
             position: fixed;
             top: 0;
@@ -44,7 +44,7 @@
             box-shadow: 0 0 8px #fff;
         }
 
-        /* 헤더: 별보다 위로 (10) */
+        /* 헤더 */
         header {
             display: flex;
             justify-content: space-between;
@@ -72,15 +72,15 @@
         .title { font-size: 3.5rem; letter-spacing: 4px; margin-bottom: 1rem; }
         .subtitle { font-size: 1.1rem; opacity: 0.6; font-family: 'Arial', sans-serif; }
 
-        /* --- 표(드라이브 컨테이너) 수정 부분 --- */
+        /* 표(드라이브 컨테이너) */
         .drive-container {
-            background-color: #000; /* 완전 검정으로 별을 가림 */
+            background-color: #000;
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             overflow: hidden;
-            margin-bottom: 6rem;
+            margin-bottom: 4rem;
             position: relative;
-            z-index: 20; /* 별들보다 훨씬 위로 올림 */
+            z-index: 20;
             box-shadow: 0 0 20px rgba(0, 0, 0, 1);
         }
 
@@ -89,7 +89,7 @@
             grid-template-columns: 2fr 1fr 1fr;
             padding: 15px 30px;
             align-items: center;
-            background-color: #000; /* 각 행도 검정 배경 */
+            background-color: #000;
         }
 
         .drive-header {
@@ -99,6 +99,17 @@
             text-transform: uppercase;
         }
 
+        /* 첼시 파란색 테마 구분선 */
+        .section-divider {
+            padding: 15px 30px;
+            background-color: #034694; /* 첼시 블루 */
+            font-size: 0.85rem;
+            color: #fff;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         .drive-item {
             transition: 0.2s;
             cursor: pointer;
@@ -106,40 +117,42 @@
         }
 
         .drive-item:hover { background-color: rgba(255, 255, 255, 0.1); }
-
         .col-name { font-family: 'Arial', sans-serif; font-size: 0.95rem; }
         .col-type, .col-date { font-family: 'Arial', sans-serif; font-size: 0.85rem; opacity: 0.5; }
 
-        /* 모달 팝업창 */
+        /* --- 모달 팝업창 크기 대폭 확장 (화면 가득) --- */
         .modal {
             display: none;
             position: fixed;
             z-index: 1000;
             left: 0; top: 0;
             width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(10px);
+            background-color: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(15px);
         }
 
         .modal-content {
-            background-color: #111;
-            margin: 5% auto;
-            padding: 40px;
-            border: 1px solid #333;
-            width: 60%;
-            max-width: 800px;
-            border-radius: 15px;
+            background-color: #0b0b0b;
+            margin: 2vh auto; /* 상하 여백 최소화 */
+            padding: 30px;
+            border: 1px solid #1a1a1a;
+            width: 92%; /* 화면 좌우 꽉 차게 */
+            max-width: 1400px;
+            height: 96vh; /* 화면 높이 거의 꽉 차게 */
+            border-radius: 12px;
             position: relative;
-            animation: modalFade 0.4s ease;
+            display: flex;
+            flex-direction: column; /* 내부 요소 세로 정렬 구조 */
+            animation: modalFade 0.3s cubic-bezier(0.25, 1, 0.5, 1);
             z-index: 1001;
         }
 
         @keyframes modalFade {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: scale(0.98) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        .close-btn { position: absolute; top: 20px; right: 30px; font-size: 30px; cursor: pointer; color: #888; }
+        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 35px; cursor: pointer; color: #666; z-index: 1010; }
         .close-btn:hover { color: #fff; }
 
         .page-footer { text-align: center; position: relative; z-index: 10; }
@@ -154,7 +167,7 @@
             .content-container { padding: 4rem 5%; }
             .drive-header { display: none; }
             .drive-item { grid-template-columns: 1fr; gap: 8px; }
-            .modal-content { width: 90%; margin: 20% auto; padding: 25px; }
+            .modal-content { width: 96%; height: 96vh; margin: 2vh auto; padding: 20px; }
         }
     </style>
 </head>
@@ -175,7 +188,7 @@
     <main class="content-container">
         <section class="intro-section">
             <h1 class="title">PROJECTS</h1>
-            <p class="subtitle">Click on a project to see detailed reports.</p>
+            <p class="subtitle">Click on a project to see detailed reports or launch interactive web labs.</p>
         </section>
 
         <section class="drive-container">
@@ -211,6 +224,24 @@
                     <div class="col-type">Biology</div>
                     <div class="col-date">2024. 04</div>
                 </div>
+
+                <div class="section-divider">INTERACTIVE WEB LABS (참여형 코딩 실험)</div>
+
+                <div class="drive-item" onclick="openModal('interactive_galaxy')">
+                    <div class="col-name">Lab 01. 손가락 중력 은하수 시뮬레이터</div>
+                    <div class="col-type">Webcam AI / Physics</div>
+                    <div class="col-date">2026. Running</div>
+                </div>
+                <div class="drive-item" onclick="openModal('interactive_voice')">
+                    <div class="col-name">Lab 02. 음성 주파수 실시간 시각화 장치</div>
+                    <div class="col-type">Audio API / Wave</div>
+                    <div class="col-date">2026. Running</div>
+                </div>
+                <div class="drive-item" onclick="openModal('interactive_sand')">
+                    <div class="col-name">Lab 03. 물리 엔진 디지털 모래성 시뮬레이터</div>
+                    <div class="col-type">Matter.js / Mechanics</div>
+                    <div class="col-date">2026. Running</div>
+                </div>
             </div>
         </section>
 
@@ -222,10 +253,12 @@
     <div id="projectModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">&times;</span>
-            <div id="modalBody"></div>
+            <div id="modalBody" style="display: flex; flex-direction: column; height: 100%;"></div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     <script src="projectsscript.js"></script>
 </body>
 </html>
