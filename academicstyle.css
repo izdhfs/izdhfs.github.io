@@ -172,3 +172,40 @@ header {
     .milestone-image { width: 100%; height: 300px; }
     .milestone-text { text-align: center; }
 }
+
+/* ==========================================
+   📱 모바일 세로 화면 최적화 (가로폭이 좁을 때 조건)
+   ========================================== */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column !important; /* 로고와 메뉴를 위아래 세로로 배치 */
+        gap: 15px !important;              /* 로고와 메뉴 사이의 간격 */
+        padding: 20px 10px !important;     /* 모바일 화면 여백 줄임 */
+        text-align: center !important;
+    }
+
+    /* 네비게이션 바가 화면 중앙으로 오도록 설정 */
+    header .main-nav {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: center !important; /* 글씨들을 가로 정가운데로 정렬 */
+        gap: 15px !important;               /* 글씨들 사이의 간격 조절 */
+    }
+
+    /* 연한 글씨 스타일 비율 보정 */
+    header .nav-item {
+        font-size: 0.85rem !important;      /* 세로 화면에 맞게 글자 크기 축소 */
+        letter-spacing: 0.5px !important;   /* 자간 조여서 한 줄 배치 유도 */
+        white-space: nowrap !important;     /* 글자가 아래로 쪼개지는 현상 방지 */
+    }
+}
+
+/* 아주 좁은 스마트폰 대응 */
+@media (max-width: 380px) {
+    header .main-nav {
+        gap: 10px !important;
+    }
+    header .nav-item {
+        font-size: 0.78rem !important;
+    }
+}
