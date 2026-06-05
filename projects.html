@@ -3,262 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projects - DoHyun Kim</title>
+    <title>과학 탐구 포트폴리오 & 인터랙티브 랩</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial Black', sans-serif;
-        }
-
-        body {
-            background-color: #000;
-            color: #fff;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        /* 기본 별 배경 */
-        #starfield {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: #000;
-        }
-
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.15;
-            transition: opacity 0.6s ease;
-        }
-
-        .star.bright {
-            opacity: 1 !important;
-            transform: scale(1.8);
-            box-shadow: 0 0 8px #fff;
-        }
-
-        /* 헤더 */
-        header {
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #020202; color: #fff; font-family: 'Pretendard', sans-serif; overflow-x: hidden; }
+        #starfield { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
+        .star { position: absolute; background-color: rgba(255, 255, 255, 0.3); border-radius: 50%; transition: background-color 0.3s, transform 0.3s; }
+        .star.bright { background-color: #034694; transform: scale(2.5); box-shadow: 0 0 8px #034694; }
+        
+        /* 🔴 스크린샷 기반 상단 내비게이션 바 헤더 스타일 포맷 */
+        header.site-header {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 60px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 2.5rem 8%;
-            position: relative;
-            z-index: 10;
         }
-
-        .logo { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; cursor: pointer; }
-        .main-nav { display: flex; gap: 30px; }
-        .nav-item {
-            color: #fff; text-decoration: none; font-size: 0.85rem;
-            opacity: 0.5; transition: 0.3s; text-transform: uppercase;
-        }
-        .nav-item:hover, .nav-item.active { opacity: 1; }
-
-        /* 컨텐츠 영역 */
-        .content-container { 
-            padding: 4rem 15% 4rem; 
-            position: relative;
-            z-index: 5;
-        }
-        .intro-section { text-align: center; margin-bottom: 5rem; }
-        .title { font-size: 3.5rem; letter-spacing: 4px; margin-bottom: 1rem; }
-        .subtitle { font-size: 1.1rem; opacity: 0.6; font-family: 'Arial', sans-serif; }
-
-        /* 표(드라이브 컨테이너) */
-        .drive-container {
-            background-color: #000;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-            margin-bottom: 4rem;
-            position: relative;
-            z-index: 20;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 1);
-        }
-
-        .drive-header, .drive-item {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            padding: 15px 30px;
-            align-items: center;
-            background-color: #000;
-        }
-
-        .drive-header {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.4);
-            text-transform: uppercase;
-        }
-
-        /* 첼시 파란색 테마 구분선 */
-        .section-divider {
-            padding: 15px 30px;
-            background-color: #034694; /* 첼시 블루 */
-            font-size: 0.85rem;
+        .header-logo {
+            font-size: 1.4rem;
+            font-weight: 900;
             color: #fff;
-            font-weight: bold;
-            letter-spacing: 1.5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+            letter-spacing: 1px;
         }
-
-        .drive-item {
-            transition: 0.2s;
-            cursor: pointer;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .drive-item:hover { background-color: rgba(255, 255, 255, 0.1); }
-        .col-name { font-family: 'Arial', sans-serif; font-size: 0.95rem; }
-        .col-type, .col-date { font-family: 'Arial', sans-serif; font-size: 0.85rem; opacity: 0.5; }
-
-        /* --- 모달 팝업창 크기 대폭 확장 (화면 가득) --- */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0; top: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(15px);
-        }
-
-        .modal-content {
-            background-color: #0b0b0b;
-            margin: 2vh auto; /* 상하 여백 최소화 */
-            padding: 30px;
-            border: 1px solid #1a1a1a;
-            width: 92%; /* 화면 좌우 꽉 차게 */
-            max-width: 1400px;
-            height: 96vh; /* 화면 높이 거의 꽉 차게 */
-            border-radius: 12px;
-            position: relative;
+        .header-nav {
             display: flex;
-            flex-direction: column; /* 내부 요소 세로 정렬 구조 */
-            animation: modalFade 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-            z-index: 1001;
+            gap: 35px;
+        }
+        .header-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+        .header-nav a:hover, .header-nav a.active {
+            opacity: 1;
         }
 
-        @keyframes modalFade {
-            from { opacity: 0; transform: scale(0.98) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
+        /* 메인 타이틀 장식 */
+        .page-title-section { position: relative; z-index: 2; max-width: 1400px; margin: 0 auto; padding: 20px 60px; }
+        .page-title-section h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 10px; background: linear-gradient(135deg, #fff 0%, #888 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .page-title-section p { color: #666; font-size: 1rem; }
 
-        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 35px; cursor: pointer; color: #666; z-index: 1010; }
+        main { position: relative; z-index: 2; max-width: 1400px; margin: 0 auto; padding: 20px 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; min-height: 80vh; }
+        .card { background: rgba(20, 20, 20, 0.6); border: 1px solid #1a1a1a; border-radius: 12px; padding: 30px; cursor: pointer; transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(3,70,148,0.1) 0%, transparent 100%); opacity: 0; transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); border-color: #034694; box-shadow: 0 10px 30px rgba(3, 70, 148, 0.2); }
+        .card:hover::before { opacity: 1; }
+        .card-tag { font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px; color: #888; }
+        .card.interactive .card-tag { color: #034694; }
+        .card h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 12px; line-height: 1.3; }
+        .card p { color: #888; font-size: 0.95rem; line-height: 1.6; margin-bottom: 25px; }
+        .card-footer { display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; font-weight: 600; color: #fff; }
+        .card-footer span { transition: transform 0.3s; }
+        .card:hover .card-footer span { transform: translateX(5px); }
+
+        /* 모달 윈도우 스타일 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 100; backdrop-filter: blur(10px); animation: fadeIn 0.25s ease-out; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 900px; height: 85vh; background-color: #0a0a0a; border: 1px solid #222; border-radius: 16px; padding: 40px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .close-btn { position: absolute; top: 25px; right: 30px; font-size: 2rem; color: #666; cursor: pointer; transition: 0.2s; z-index: 101; }
         .close-btn:hover { color: #fff; }
+        .modal-body { width: 100%; flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; color: #ccc; }
 
-        .page-footer { text-align: center; position: relative; z-index: 10; }
-        .back-btn {
-            color: #fff; text-decoration: none; font-size: 0.8rem; opacity: 0.4;
-            text-transform: uppercase; letter-spacing: 2px; padding: 10px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px; transition: 0.3s;
-        }
-        .back-btn:hover { opacity: 1; border-color: #fff; background-color: rgba(255, 255, 255, 0.05); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+        /* ─── 📱 모바일 세로 화면 메뉴 정렬 (IZDHFS 로고 밑으로 이동) ─── */
         @media (max-width: 768px) {
-            .content-container { padding: 4rem 5%; }
-            .drive-header { display: none; }
-            .drive-item { grid-template-columns: 1fr; gap: 8px; }
-            .modal-content { width: 96%; height: 96vh; margin: 2vh auto; padding: 20px; }
+            header.site-header {
+                flex-direction: column !important; /* 위아래 세로 배치 */
+                gap: 15px !important;              /* 로고와 메뉴 사이 간격 */
+                padding: 20px 10px !important;     /* 모바일 여백 조절 */
+                text-align: center !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+
+            .header-nav {
+                display: flex !important;
+                width: 100% !important;
+                justify-content: center !important; /* 메뉴 가로 중앙 정렬 */
+                gap: 15px !important;               /* 메뉴 아이템 간 간격 */
+            }
+
+            .header-nav a {
+                font-size: 0.8rem !important;       /* 글씨 크기 축소 */
+                letter-spacing: 0.5px !important;
+                white-space: nowrap !important;      /* 줄바꿈 방지 */
+                opacity: 0.8 !important;            /* 모바일에서 가독성 위해 살짝 진하게 */
+            }
+        }
+
+        /* 아주 좁은 화면 대응 */
+        @media (max-width: 380px) {
+            .header-nav {
+                gap: 10px !important;
+            }
+            .header-nav a {
+                font-size: 0.75rem !important;
+            }
         }
     </style>
 </head>
 <body>
+
     <div id="starfield"></div>
 
-    <header>
-        <div class="logo" onclick="location.href='index.html'">IZDHFS</div>
-        <nav class="main-nav">
-            <a href="index.html" class="nav-item">Home</a>
-            <a href="personal.html" class="nav-item">Personal</a>
-            <a href="academic.html" class="nav-item">Academic</a>
-            <a href="projects.html" class="nav-item active">Projects</a>
+    <header class="site-header">
+        <a href="index.html" class="header-logo">IZDHFS</a>
+        <nav class="header-nav">
+            <a href="index.html">HOME</a>
+            <a href="#personal">PERSONAL</a>
+            <a href="#academic">ACADEMIC</a>
+            <a href="projects.html" class="active">PROJECTS</a>
         </nav>
-        <div class="header-right" style="width:1.2rem;"></div>
     </header>
 
-    <main class="content-container">
-        <section class="intro-section">
-            <h1 class="title">PROJECTS</h1>
-            <p class="subtitle">Click on a project to see detailed reports or launch interactive web labs.</p>
-        </section>
+    <div class="page-title-section">
+        <h1>EXPLORE PROJECTS</h1>
+        <p>과학적 탐구 역량과 인터랙티브 기술의 융합 기록</p>
+    </div>
 
-        <section class="drive-container">
-            <div class="drive-header">
-                <div class="col-name">Name</div>
-                <div class="col-type">Type</div>
-                <div class="col-date">Date</div>
+    <main>
+        <div class="card" onclick="openModal('luminol')">
+            <div>
+                <div class="card-tag">Research Experiment</div>
+                <h3>루미놀 용액 반응<br>과학 탐구 실험</h3>
+                <p>철 촉매와 활성화 에너지 원리를 활용한 과학수사 기법 분석 및 정밀 실험 설계 실적.</p>
             </div>
-            
-            <div class="drive-list">
-                <div class="drive-item" onclick="openModal('luminol')">
-                    <div class="col-name">루미놀 용액 반응 실험</div>
-                    <div class="col-type">Chemistry</div>
-                    <div class="col-date">2023. 05</div>
-                </div>
-                <div class="drive-item" onclick="openModal('spectroscopy')">
-                    <div class="col-name">기초 분광학 실험</div>
-                    <div class="col-type">Physics</div>
-                    <div class="col-date">2023. 08</div>
-                </div>
-                <div class="drive-item" onclick="openModal('debate')">
-                    <div class="col-name">과학토론대회</div>
-                    <div class="col-type">Academic</div>
-                    <div class="col-date">2023. 11</div>
-                </div>
-                <div class="drive-item" onclick="openModal('saltfinger')">
-                    <div class="col-name">솔트핑거현상 실험</div>
-                    <div class="col-type">Earth Science</div>
-                    <div class="col-date">2024. 02</div>
-                </div>
-                <div class="drive-item" onclick="openModal('hormone')">
-                    <div class="col-name">호르몬 실험</div>
-                    <div class="col-type">Biology</div>
-                    <div class="col-date">2024. 04</div>
-                </div>
+            <div class="card-footer">자세히 보기 <span>→</span></div>
+        </div>
 
-                <div class="section-divider">INTERACTIVE WEB LABS (참여형 코딩 실험)</div>
-
-                <div class="drive-item" onclick="openModal('interactive_galaxy')">
-                    <div class="col-name">Lab 01. 손가락 중력 은하수 시뮬레이터</div>
-                    <div class="col-type">Webcam AI / Physics</div>
-                    <div class="col-date">2026. Running</div>
-                </div>
-                <div class="drive-item" onclick="openModal('interactive_voice')">
-                    <div class="col-name">Lab 02. 음성 주파수 실시간 시각화 장치</div>
-                    <div class="col-type">Audio API / Wave</div>
-                    <div class="col-date">2026. Running</div>
-                </div>
-                <div class="drive-item" onclick="openModal('interactive_sand')">
-                    <div class="col-name">Lab 03. 물리 엔진 디지털 모래성 시뮬레이터</div>
-                    <div class="col-type">Matter.js / Mechanics</div>
-                    <div class="col-date">2026. Running</div>
-                </div>
+        <div class="card" onclick="openModal('spectroscopy')">
+            <div>
+                <div class="card-tag">Physics Lab</div>
+                <h3>기초 분광학<br>광학 스펙트럼 분석</h3>
+                <p>빛의 회절과 파장 관측을 통해 물질의 고유 성분을 추적하는 분광 광학 실험.</p>
             </div>
-        </section>
+            <div class="card-footer">자세히 보기 <span>→</span></div>
+        </div>
 
-        <footer class="page-footer">
-            <a href="select.html" class="back-btn">Back to Select</a>
-        </footer>
+        <div class="card" onclick="openModal('debate')">
+            <div>
+                <div class="card-tag">Competition</div>
+                <h3>교내 과학토론대회<br>우수 수상 실적</h3>
+                <p>현대 과학 이슈에 대한 다각도 논리 전개 및 기술 해결 대안 제시 토론 실적.</p>
+            </div>
+            <div class="card-footer">자세히 보기 <span>→</span></div>
+        </div>
+
+        <div class="card interactive" onclick="openModal('interactive_galaxy')">
+            <div>
+                <div class="card-tag">Interactive Lab 01</div>
+                <h3>손가락 중력<br>은하수 시뮬레이터</h3>
+                <p>AI 손끝 추적 기술과 천체 중력 연산 법칙을 융합한 인터랙티브 가상 우주 공간.</p>
+            </div>
+            <div class="card-footer" style="color:#38bdf8;">실험실 입장 <span>→</span></div>
+        </div>
+
+        <div class="card interactive" onclick="openModal('interactive_voice')">
+            <div>
+                <div class="card-tag">Interactive Lab 02</div>
+                <h3>음성 주파수<br>실시간 시각화 분석기</h3>
+                <p>Web Audio API 아날라이저 기반 음성 성질 파동의 수학적 렌더링 디지털 장치.</p>
+            </div>
+            <div class="card-footer" style="color:#38bdf8;">실험실 입장 <span>→</span></div>
+        </div>
+
+        <div class="card interactive" onclick="openModal('interactive_sand')">
+            <div>
+                <div class="card-tag">Interactive Lab 03</div>
+                <h3>물리 역학 디지털<br>모래성 시뮬레이터</h3>
+                <p>내 모습 위에 떨어지는 무거운 모래 알갱이들의 마찰 및 각도 누적 물리 엔진실.</p>
+            </div>
+            <div class="card-footer" style="color:#38bdf8;">실험실 입장 <span>→</span></div>
+        </div>
+
+        <div class="card interactive" onclick="openModal('interactive_3d')">
+            <div>
+                <div class="card-tag">Interactive Lab 04</div>
+                <h3>JARVIS 가상 공간<br>홀로그램 입체 연성소</h3>
+                <p>손가락 수로 도형을 고르고, 양손을 오므린 간격 사이에 단 하나의 3D 입체를 설계하는 미래 기술형 실험실.</p>
+            </div>
+            <div class="card-footer" style="color:#00d2ff;">실험실 입장 <span>→</span></div>
+        </div>
     </main>
 
     <div id="projectModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">&times;</span>
-            <div id="modalBody" style="display: flex; flex-direction: column; height: 100%;"></div>
+            <div id="modalBody" class="modal-body"></div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     <script src="projectsscript.js"></script>
 </body>
 </html>
+
