@@ -205,3 +205,67 @@ header {
     }
     .name { font-size: 3.2rem; }
 }
+
+/* ==========================================
+   📱 모바일 세로 화면 최적화 (가로폭이 좁을 때 조건)
+   ========================================== */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column !important; /* 로고와 메뉴를 위아래 세로로 배치 */
+        gap: 15px !important;              /* 로고와 메뉴 사이의 간격 */
+        padding: 20px 10px !important;     /* 모바일 화면 여백 줄임 */
+        text-align: center !important;
+    }
+
+    /* 네비게이션 바가 화면 중앙으로 오도록 설정 */
+    header .main-nav {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: center !important; /* 글씨들을 가로 정가운데로 정렬 */
+        gap: 15px !important;               /* 글씨들 사이의 간격 조절 */
+    }
+
+    /* 연한 글씨 스타일 비율 보정 */
+    header .nav-item {
+        font-size: 0.85rem !important;      /* 세로 화면에 맞게 글자 크기 축소 */
+        letter-spacing: 0.5px !important;   /* 자간 조여서 한 줄 배치 유도 */
+        white-space: nowrap !important;     /* 글자가 아래로 쪼개지는 현상 방지 */
+    }
+}
+
+/* ==========================================
+   📱 모바일 세로 화면 최적화 (가로폭 768px 이하 조건)
+   ========================================== */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column !important; /* IZDHFS 로고와 메뉴를 위아래 세로로 배치 */
+        gap: 15px !important;              /* 로고와 메뉴 사이의 상하 간격 */
+        padding: 20px 10px !important;     /* 양옆 여백을 줄여 모바일 공간 확보 */
+        text-align: center !important;
+    }
+
+    /* 네비게이션 컨테이너를 가로 정가운데로 정렬 */
+    header .main-nav {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: center !important; /* 메뉴 글씨들을 가로 정가운데로 정렬 */
+        gap: 15px !important;               /* 글씨들 사이의 좌우 간격 */
+    }
+
+    /* 연한 글씨 메뉴 아이템 비율 보정 */
+    header .nav-item {
+        font-size: 0.85rem !important;      /* 세로 화면에 맞게 글자 크기 축소 */
+        letter-spacing: 0.5px !important;   /* 자간을 조여 한 줄에 들어가도록 처리 */
+        white-space: nowrap !important;     /* 화면이 좁아도 글자가 위아래로 깨지지 않게 고정 */
+    }
+}
+
+/* 스마트폰 화면이 극단적으로 좁을 때 (아이폰 SE 등 가로 380px 이하) */
+@media (max-width: 380px) {
+    header .main-nav {
+        gap: 10px !important;               /* 메뉴 간격을 더 좁혀서 겹침 방지 */
+    }
+    header .nav-item {
+        font-size: 0.78rem !important;      /* 글씨를 조금 더 축소 */
+    }
+}
