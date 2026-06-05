@@ -1,15 +1,15 @@
 // ==========================================
-// 1. 전역 변수 및 기본 배경 화면 (메인 페이지용 별들)
+// 1. 전역 변수 및 기본 배경 화면 (마우스 반응형 흰색 별빛)
 // ==========================================
 const starField = document.getElementById('starfield');
 const starCount = 300; 
 const stars = [];
 
-// 인터랙티브 랩 제어용 전역 변수 (메모리 누수 및 하드웨어 다중 구동 차단)
 let activeAnimationId = null;
 let activeCamera = null;
 let activeAudioStream = null;
 let activeAudioContext = null;
+let threeRenderer = null; 
 
 function initStars() {
     starField.innerHTML = '';
@@ -18,11 +18,16 @@ function initStars() {
         star.className = 'star';
         const x = Math.random() * 100;
         const y = Math.random() * 100;
-        const size = Math.random() * 1.8 + 0.5;
+        const size = Math.random() * 1.8 + 0.6;
         star.style.left = `${x}%`;
         star.style.top = `${y}%`;
         star.style.width = `${size}px`;
         star.style.height = `${size}px`;
+        star.style.backgroundColor = '#ffffff'; 
+        star.style.position = 'absolute';
+        star.style.borderRadius = '50%';
+        star.style.opacity = '0'; 
+        star.style.transition = 'opacity 0.6s ease, transform 0.4s ease, box-shadow 0.4s ease';
         starField.appendChild(star);
         stars.push({ el: star, x: (x / 100) * window.innerWidth, y: (y / 100) * window.innerHeight });
     }
@@ -33,71 +38,84 @@ window.addEventListener('mousemove', (e) => {
         const dx = e.clientX - star.x;
         const dy = e.clientY - star.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 150) star.el.classList.add('bright');
-        else star.el.classList.remove('bright');
+        if (dist < 120) {
+            star.el.style.opacity = '1';
+            star.el.style.transform = 'scale(2.2)';
+            star.el.style.boxShadow = '0 0 12px rgba(255, 255, 255, 1)';
+        } else {
+            star.el.style.opacity = '0';
+            star.el.style.transform = 'scale(1)';
+            star.el.style.boxShadow = 'none';
+        }
     });
 });
 
 // ==========================================
-// 2. 전체 프로젝트 데이터 정의 (모달용)
+// 2. 전체 프로젝트 데이터 정의
 // ==========================================
 const modalData = {
     'luminol': {
         title: '루미놀 용액 반응 실험',
-        content: `루미놀 용액과 과산화수소를 적정 비율로 섞어 제조한 후, 직접 채혈한 혈액 시료를 추출하여 실험을 진행했습니다. 어두운 환경에서 나타나는 청백색 발광 현상을 관찰하며, 혈액 내 헤모글로빈의 철 이온이 활성화 에너지를 낮추는 촉매 역할을 하여 화학 에너지가 빛 에너지로 전환되는 원리를 확인했습니다. 또한, 1만 배 희석된 혈흔에서도 감식이 가능한 국내 과학수사 기술인 '신루미놀'의 발전상을 조사하며 과학적 탐구의 실용적 가치를 고찰하였습니다.`,
+        content: `루미놀 용액과 과산화수소를 적정 비율로 섞어 제조한 후, 직접 채혈한 혈액 시료를 추출하여 실험을 진행했습니다. 어두운 환경에서 나타나는 청백색 발광 현상을 관찰하며, 혈액 내 헤모글로빈의 철 이온이 활성화 에너지를 낮추는 촉매 역할을 하여 화학 에너지가 빛 에너지로 전환되는 원리를 확인했습니다.`,
         image: 'luminol_detail.jpg',
         isInteractive: false
     },
     'spectroscopy': { title: '기초 분광학 실험', content: '내용 준비 중입니다.', image: 'spectroscopy.jpg', isInteractive: false },
     'debate': { title: '과학토론대회', content: '내용 준비 중입니다.', image: 'debate.jpg', isInteractive: false },
-    'saltfinger': { title: '솔트핑거현상 실험', content: '내용 준비 중입니다.', image: 'saltfinger.jpg', isInteractive: false },
-    'hormone': { title: '호르몬 실험', content: '내용 준비 중입니다.', image: 'hormone.jpg', isInteractive: false },
     
-    'interactive_galaxy': {
-        title: 'Lab 01. 손가락 중력 은하수 시뮬레이터',
-        content: '웹캠을 통해 사용자의 검지 손가락을 인식하고, 그 끝에 가상의 가속도(중력)를 부여하여 디지털 별 입자들을 조종하는 물리 연산 스크립트입니다.',
-        isInteractive: true,
-        labType: 'galaxy'
+    'interactive_galaxy': { 
+        title: 'Lab 01. 주먹 중력 은하수 연성소', 
+        content: 'AI 손끝 추적 기술하고 천체 중력 연산 법칙을 융합한 인터랙티브 가상 우주 공간.', 
+        isInteractive: true, 
+        labType: 'galaxy',
+        guide: `<span style="color:#ff0055; font-weight:bold; font-size:1.05rem;">[Lab 01 이용 방법]</span><br><br>• <span style="color:#fff; font-weight:bold;">주먹 꽉 쥐기</span>: 은하수가 중앙으로 흡수되며 게이지가 충전됩니다.<br>• <span style="color:#ff0055; font-weight:bold;">90% 돌파 시</span> 게이지가 핑크색으로 각성합니다.<br>• 그 상태에서 손을 쫙 펼치면 화면 전체가 핑크빛 충격파로 가득 차며 대폭발합니다.`
     },
-    'interactive_voice': {
-        title: 'Lab 02. 음성 주파수 실시간 시각화 장치',
-        content: '마이크 입력을 받아 Web Audio API를 통해 소리의 고유 주파수 성분을 실시간으로 분석하고, 파동 그래픽으로 표현하는 장치입니다.',
-        isInteractive: true,
-        labType: 'voice'
+    'interactive_voice': { 
+        title: 'Lab 02. 실시간 3단 주파수 스펙트럼 분석기', 
+        content: 'Web Audio API 아날라이저 기반 음성 성질 파동의 수학적 렌더링 디지털 장치.', 
+        isInteractive: true, 
+        labType: 'voice',
+        guide: `<span style="color:#00d2ff; font-weight:bold; font-size:1.05rem;">[Lab 02 이용 방법]</span><br><br>• 마이크 볼륨에 맞추어 상단 오실로스코프 파형이 일렉트릭 블루 색상으로 춤을 춥니다.<br>• 하단 인터페이스 바를 통해 <span style="color:#fff; font-weight:bold;">저음역대, 중음역대, 고음역대(Hz)</span> 수치가 정밀 실시간 실감 매핑 분류됩니다.`
     },
-    'interactive_sand': {
-        title: 'Lab 03. 물리 엔진 디지털 모래성 시뮬레이터',
-        content: '웹캠을 통해 사용자님의 모습 위에 큼직한 첼시 블루 모래 폭포가 쏟아지고 빠르게 쌓이는 고체 물리 시뮬레이션입니다.',
+    'interactive_sand': { 
+        title: 'Lab 03. 물리 역학 오로라 모래성', 
+        content: '내 모습 위에 떨어지는 무거운 모래 알갱이들의 마찰 및 각도 누적 물리 엔진실.', 
+        isInteractive: true, 
+        labType: 'sand',
+        guide: `<span style="color:#00ffaa; font-weight:bold; font-size:1.05rem;">[Lab 03 이용 방법]</span><br><br>• 엄지와 검지를 붙잡는 핀치 모션을 취해보세요.<br>• 입체 글로우 효과와 오로라 그라데이션이 결합된 예술적인 물리 모래 알갱이들이 손가락 끝에서 실시간 합성 투하됩니다.`
+    },
+    'interactive_3d': {
+        title: 'Lab 04. JARVIS 가상 홀로그램 입체 연성소',
+        content: '한 손 제스처를 1초간 유지하여 도형을 고르고, 한 손으로 "탁, 탁!" 연속 두 번 핀치하여 그 자리에 입체를 생성하세요.',
         isInteractive: true,
-        labType: 'sand'
+        labType: 'three3d',
+        guide: `<span style="color:#00d2ff; font-weight:bold; font-size:1.05rem;">[Lab 04 이용 방법]</span><br><br>• <span style="color:#38bdf8; font-weight:bold;">도형 선택</span>: 한 손인 상태로 ☝️큐브 | ✌️구 | 🤟도넛 모양 <span style="color:#00ffff; font-weight:bold;">1초 유지</span><br>• <span style="color:#00ffaa; font-weight:bold;">입체 생성</span>: 한 손으로 "탁, 탁!" 연속 두 번 핀치하여 그 자리에 입체 생성`
     }
 };
 
-// ==========================================
-// 3. 모달 UI 제어 (열기 / 닫기)
-// ==========================================
 function openModal(id) {
     const data = modalData[id];
     const modalBody = document.getElementById('modalBody');
     
     if (!data.isInteractive) {
         modalBody.innerHTML = `
-            <h2 style="margin-bottom:20px; font-size:1.8rem; border-bottom:1px solid #333; padding-bottom:10px;">${data.title}</h2>
-            <div style="width:100%; height:350px; background-color:#222; border-radius:8px; margin-bottom:25px; overflow:hidden;">
-                <img src="${data.image}" alt="${data.title}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='<div style=display:flex;justify-content:center;align-items:center;height:100%;color:#888;font-size:0.9rem;>관련 사진을 준비하고 있습니다.</div>'">
+            <h2 style="margin-bottom:20px; font-size:1.8rem; border-bottom:1px solid #222; padding-bottom:12px; color:#fff;">${data.title}</h2>
+            <div style="width:100%; height:350px; background-color:#0d0d1a; border: 1px solid #1f1f38; border-radius:12px; margin-bottom:25px; overflow:hidden;">
+                <img src="${data.image}" alt="${data.title}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='<div style=display:flex;justify-content:center;align-items:center;height:100%;color:#555;>이미지 준비 중</div>'">
             </div>
-            <p style="font-size:1rem; line-height:1.8; color:#ccc; word-break:keep-all; font-family:sans-serif;">${data.content}</p>
+            <p style="font-size:0.95rem; line-height:1.8; color:#b4b4c7;">${data.content}</p>
         `;
     } else {
         modalBody.innerHTML = `
-            <h2 style="margin-bottom:5px; font-size:1.6rem; color:#fff;">${data.title}</h2>
-            <p style="font-size:0.9rem; color:#666; margin-bottom:15px; font-family:sans-serif;">${data.content}</p>
-            <div id="canvasContainer" style="width:100%; flex-grow:1; background-color:#020202; border:1px solid #1f1f1f; border-radius:8px; position:relative; overflow:hidden; display:flex; justify-content:center; align-items:center;">
-                <button onclick="startLab('${data.labType}')" style="padding:15px 35px; background-color:#034694; color:#fff; border:1px solid rgba(255,255,255,0.1); border-radius:6px; font-weight:bold; cursor:pointer; font-size:1rem; letter-spacing:1px; transition:0.2s; box-shadow:0 4px 15px rgba(3,70,148,0.4);">Launch Laboratory</button>
+            <div>
+                <h2 style="font-size:1.5rem; color:#fff; font-weight:600; margin:0;">${data.title}</h2>
+                <p style="font-size:0.85rem; color:#666680; margin:4px 0 15px 0;">${data.content}</p>
+            </div>
+            <div id="canvasContainer" style="width:100%; flex-grow:1; background-color:#010103; border:1px solid #131324; border-radius:16px; position:relative; overflow:hidden; display:flex; justify-content:center; align-items:center; box-shadow: inset 0 0 40px rgba(0,0,0,0.95);">
+                <button onclick="startLab('${data.labType}')" style="padding:15px 40px; background: linear-gradient(135deg, #034694, #021226); color:#fff; border:1px solid rgba(56,189,248,0.2); border-radius:30px; font-weight:bold; cursor:pointer; font-size:0.95rem; letter-spacing:1px; transition:0.3s; box-shadow:0 0 20px rgba(3,70,148,0.4);">LAUNCH LABORATORY</button>
             </div>
         `;
     }
-    
     document.getElementById('projectModal').style.display = 'block';
     document.body.style.overflow = 'hidden';
 }
@@ -105,31 +123,39 @@ function openModal(id) {
 function closeModal() {
     document.getElementById('projectModal').style.display = 'none';
     document.body.style.overflow = 'auto';
-
-    if (activeAnimationId) {
-        cancelAnimationFrame(activeAnimationId);
-        activeAnimationId = null;
-    }
+    if (activeAnimationId) { cancelAnimationFrame(activeAnimationId); activeAnimationId = null; }
     if (activeCamera) {
         const video = document.getElementById('labWebcam');
-        if (video && video.srcObject) {
-            const stream = video.srcObject;
-            stream.getTracks().forEach(track => track.stop());
-        }
+        if (video && video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); }
         activeCamera = null;
     }
-    if (activeAudioStream) {
-        activeAudioStream.getTracks().forEach(track => track.stop());
-        activeAudioStream = null;
-    }
-    if (activeAudioContext) {
-        activeAudioContext.close();
-        activeAudioContext = null;
-    }
+    if (activeAudioStream) { activeAudioStream.getTracks().forEach(track => track.stop()); activeAudioStream = null; }
+    if (activeAudioContext) { activeAudioContext.close(); activeAudioContext = null; }
+    if (threeRenderer) { threeRenderer.dispose(); threeRenderer = null; }
 }
 
-window.onclick = function(event) {
-    if (event.target == document.getElementById('projectModal')) closeModal();
+function injectHelpButton(container, guideHtml) {
+    const helpBtn = document.createElement('button');
+    helpBtn.innerHTML = 'ℹ️ HELP';
+    helpBtn.style = `
+        position: absolute; top: 20px; left: 20px; z-index: 100;
+        background: rgba(10, 15, 30, 0.8); color: #00d2ff;
+        border: 1px solid rgba(0, 210, 255, 0.3); padding: 8px 16px;
+        border-radius: 20px; font-weight: bold; font-size: 0.8rem; cursor: pointer; backdrop-filter: blur(8px);
+    `;
+    const helpBox = document.createElement('div');
+    helpBox.innerHTML = guideHtml;
+    helpBox.style = `
+        position: absolute; top: 65px; left: 20px; z-index: 99;
+        width: 320px; background: rgba(4, 6, 16, 0.95); color: #e5e7eb;
+        border: 1px solid rgba(56, 189, 248, 0.4); padding: 18px; border-radius: 12px;
+        font-size: 0.85rem; line-height: 1.6; display: none; backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    `;
+    helpBtn.onmouseenter = () => { helpBox.style.display = 'block'; helpBtn.style.background = '#00d2ff'; helpBtn.style.color = '#000'; };
+    helpBtn.onmouseleave = () => { helpBox.style.display = 'none'; helpBtn.style.background = 'rgba(10,15,30,0.8)'; helpBtn.style.color = '#00d2ff'; };
+    container.appendChild(helpBtn);
+    container.appendChild(helpBox);
 }
 
 // ==========================================
@@ -137,433 +163,546 @@ window.onclick = function(event) {
 // ==========================================
 function startLab(type) {
     const container = document.getElementById('canvasContainer');
+    const spec = Object.values(modalData).find(m => m.labType === type);
     
-    // ------------------------------------------
-    // [Lab 01] 은하수 제스처 시뮬레이터 구동
-    // ------------------------------------------
+    // 🌌 [Lab 01] 은하수 시뮬레이터 (중력 수치 정밀 보정 완료)
     if (type === 'galaxy') {
         container.innerHTML = `
-            <div id="loadingText" style="position:absolute; color:#034694; font-family:sans-serif; font-size:1rem; font-weight:bold; letter-spacing:1px; z-index:10;">INITIALIZING EMBEDDED AI SYSTEM...</div>
-            <div id="gestureGuide" style="position:absolute; top:20px; left:20px; color:rgba(255,255,255,0.4); font-family:sans-serif; font-size:0.85rem; z-index:10; line-height:1.5; pointer-events:none;">
-                [제스처 가이드]<br>
-                - 주먹을 오므리면: 은하수가 흡수되며 게이지 충전!<br>
-                - <span style="color:#ff0055; font-weight:bold;">CHARGE 90% 이상</span>에서 펼쳐야만 사방으로 대폭발! (90% 미만은 불발)
+            <div id="loadingText" style="position:absolute; color:#ff0055; font-family:sans-serif; font-size:0.9rem; font-weight:bold; z-index:10;">CALIBRATING NEURAL GESTURE...</div>
+            <div id="gaugeUI" style="position:absolute; top:20px; right:20px; width:180px; height:24px; background:rgba(5,5,10,0.8); border:1px solid rgba(56,189,248,0.2); border-radius:12px; overflow:hidden; z-index:10; display:flex; align-items:center;">
+                <div id="gaugeBar" style="width:0%; height:100%; background:gradient(90deg, #034694, #38bdf8); transition: background 0.2s;"></div>
+                <span id="gaugeText" style="position:absolute; width:100%; text-align:center; font-size:0.7rem; font-family:sans-serif; color:#fff; font-weight:bold;">CHARGE: 0%</span>
             </div>
-            <div id="gaugeUI" style="position:absolute; top:20px; right:30px; width:180px; height:24px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; overflow:hidden; z-index:10; display:flex; align-items:center;">
-                <div id="gaugeBar" style="width:0%; height:100%; background:linear-gradient(90deg, #034694, #38bdf8); transition: width 0.1s ease;"></div>
-                <span id="gaugeText" style="position:absolute; width:100%; text-align:center; font-size:0.75rem; font-family:sans-serif; color:#fff; font-weight:bold;">CHARGE: 0%</span>
-            </div>
-            <video id="labWebcam" autoplay playsinline style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.15; transform: scaleX(-1); z-index:2; pointer-events:none;"></video>
+            <video id="labWebcam" autoplay playsinline style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.12; transform: scaleX(-1); z-index:2; pointer-events:none;"></video>
             <canvas id="labCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:5; background: transparent;"></canvas>
         `;
-
-        const canvas = document.getElementById('labCanvas');
-        const ctx = canvas.getContext('2d');
-        const video = document.getElementById('labWebcam');
-        const loadingText = document.getElementById('loadingText');
-        const gaugeBar = document.getElementById('gaugeBar');
-        const gaugeText = document.getElementById('gaugeText');
-
-        canvas.width = container.clientWidth;
-        canvas.height = container.clientHeight;
-
-        const pCount = 650; 
-        const particles = [];
-        let targetX = canvas.width / 2;
-        let targetY = canvas.height / 2;
-        let isHandFound = false;
+        injectHelpButton(container, spec.guide);
         
-        let isPinched = false; 
-        let lastPinchedState = false;
-        let isExploding = false;
-        let explosionStartTime = 0;
-        let currentCharge = 0; 
+        const canvas = document.getElementById('labCanvas'); const ctx = canvas.getContext('2d'); const video = document.getElementById('labWebcam');
+        const loadingText = document.getElementById('loadingText'); const gaugeBar = document.getElementById('gaugeBar'); const gaugeText = document.getElementById('gaugeText');
+        canvas.width = container.clientWidth; canvas.height = container.clientHeight;
+        
+        const pCount = 650; const particles = [];
+        let targetX = canvas.width / 2; let targetY = canvas.height / 2;
+        let isHandFound = false; let isFist = false; let lastFistState = false;
+        let isExploding = false; let explosionStartTime = 0; let currentCharge = 0;
+        let pinkFlashOpacity = 0; 
 
         for (let i = 0; i < pCount; i++) {
             particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                vx: (Math.random() - 0.5) * 2,
-                vy: (Math.random() - 0.5) * 2,
+                x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 2, vy: (Math.random() - 0.5) * 2,
                 size: Math.random() * 2.5 + 0.5,
                 color: `hsl(${Math.random() * 40 + 200}, 90%, ${Math.random() * 30 + 60}%)`,
                 baseColor: `hsl(${Math.random() * 40 + 200}, 90%, ${Math.random() * 30 + 60}%)`,
-                friction: 0.98,
-                ease: Math.random() * 0.04 + 0.01
+                friction: 0.98, ease: Math.random() * 0.04 + 0.01
             });
         }
 
         function explode(cx, cy, chargePower) {
-            isExploding = true;
+            isExploding = true; 
             explosionStartTime = Date.now();
+            pinkFlashOpacity = 0.75; 
             particles.forEach((p, index) => {
-                const baseAngle = (index / pCount) * Math.PI * 2;
-                const randomSpread = (Math.random() - 0.5) * 0.5; 
-                const angle = baseAngle + randomSpread;
-                const force = (Math.random() * 15 + 10) * (chargePower / 100 + 0.3);
-                p.vx = Math.cos(angle) * force;
-                p.vy = Math.sin(angle) * force;
-                p.color = `hsl(${Math.random() * 50 + 240}, 100%, 80%)`; 
+                const angle = (index / pCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+                const force = (Math.random() * 18 + 12) * (chargePower / 100 + 0.4);
+                p.vx = Math.cos(angle) * force; p.vy = Math.sin(angle) * force;
+                p.color = `hsl(${Math.random() * 40 + 320}, 100%, 75%)`; 
             });
         }
 
         function drawFrame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'rgba(2, 2, 2, 0.85)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            let timeElapsed = Date.now() - explosionStartTime;
-            if (isExploding && timeElapsed > 1000) {
-                isExploding = false;
-                particles.forEach(p => p.color = p.baseColor);
+            ctx.fillStyle = 'rgba(2, 2, 5, 0.88)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            if (isExploding && Date.now() - explosionStartTime > 1200) { isExploding = false; particles.forEach(p => p.color = p.baseColor); }
+            
+            if (isHandFound && isFist && !isExploding) { currentCharge = Math.min(100, currentCharge + 1.6); } 
+            else if (!isExploding) { currentCharge = Math.max(0, currentCharge - 3.0); }
+            
+            if (currentCharge >= 90) {
+                gaugeBar.style.background = 'linear-gradient(90deg, #ff0055, #ff77aa)';
+                gaugeBar.style.boxShadow = '0 0 10px rgba(255, 0, 85, 0.8)';
+            } else {
+                gaugeBar.style.background = 'linear-gradient(90deg, #034694, #38bdf8)';
+                gaugeBar.style.boxShadow = 'none';
             }
-
-            if (isHandFound && isPinched && !isExploding) {
-                if (currentCharge < 100) currentCharge += 1.3; 
-                if (currentCharge > 100) currentCharge = 100;
-            } else if (!isExploding) {
-                if (currentCharge > 0) currentCharge -= 2.5; 
-                if (currentCharge < 0) currentCharge = 0;
-            }
-
-            gaugeBar.style.width = `${currentCharge}%`;
+            gaugeBar.style.width = `${currentCharge}%`; 
             gaugeText.innerText = `CHARGE: ${Math.floor(currentCharge)}%`;
             
-            if (currentCharge >= 90) gaugeBar.style.background = '#ff0055'; 
-            else gaugeBar.style.background = 'linear-gradient(90deg, #034694, #38bdf8)';
-
             particles.forEach(p => {
-                if (isExploding) {
-                    p.friction = 0.94; 
-                } else if (isHandFound) {
-                    if (isPinched) {
-                        const dx = targetX - p.x;
-                        const dy = targetY - p.y;
-                        const pullForce = 2.8 + (currentCharge / 40);
-                        p.vx += dx * (p.ease * pullForce);
-                        p.vy += dy * (p.ease * pullForce);
-                        p.friction = 0.82; 
-                    } else {
-                        const dx = targetX - p.x;
-                        const dy = targetY - p.y;
-                        p.vx += dx * (p.ease * 0.3);
-                        p.vy += dy * (p.ease * 0.3);
-                        p.friction = 0.98;
-                    }
-                } else {
-                    p.friction = 0.98;
-                }
-
-                p.vx *= p.friction;
-                p.vy *= p.friction;
-                p.x += p.vx;
-                p.y += p.vy;
-
-                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fillStyle = p.color;
-                ctx.shadowBlur = (isPinched || isExploding) ? p.size * 4 : p.size * 1;
-                ctx.shadowColor = p.color;
-                ctx.fill();
+                if (isExploding) p.friction = 0.93;
+                else if (isHandFound) {
+                    const dx = targetX - p.x; const dy = targetY - p.y;
+                    
+                    // 🌟 주먹 쥘 때 순식간에 한 점으로 결집되지 않도록 연산 속도 제어 및 유체역학적 흐름 부여
+                    const pull = isFist ? 0.3 + (currentCharge / 300) : 0.05;
+                    p.vx += dx * (p.ease * pull); p.vy += dy * (p.ease * pull);
+                    
+                    // 칼같이 박히지 않고 궤도를 타고 공전할 수 있도록 유연한 마찰값 세팅
+                    p.friction = isFist ? 0.91 : 0.98;
+                } else p.friction = 0.98;
+                p.vx *= p.friction; p.vy *= p.friction; p.x += p.vx; p.y += p.vy;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.fill();
             });
 
             if (isHandFound && !isExploding) {
-                ctx.beginPath();
-                ctx.arc(targetX, targetY, isPinched ? 14 + (currentCharge * 0.2) : 7, 0, Math.PI * 2);
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = isPinched ? (currentCharge >= 90 ? '#ff0055' : 'rgba(3, 70, 148, 0.8)') : 'rgba(3, 70, 148, 0.4)';
-                ctx.stroke();
+                ctx.beginPath(); ctx.arc(targetX, targetY, isFist ? 15 + (currentCharge * 0.25) : 8, 0, Math.PI * 2);
+                ctx.lineWidth = 2; ctx.strokeStyle = isFist ? '#ff0055' : '#38bdf8'; ctx.stroke();
+            }
 
-                ctx.beginPath();
-                ctx.arc(targetX, targetY, isPinched ? 10 : 7, 0, Math.PI * 2);
-                ctx.fillStyle = isPinched ? (currentCharge >= 90 ? '#ff0055' : '#ffffff') : 'rgba(255, 255, 255, 0.8)'; 
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = '#034694';
-                ctx.fill();
+            if (pinkFlashOpacity > 0) {
+                ctx.fillStyle = `rgba(255, 180, 210, ${pinkFlashOpacity})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                pinkFlashOpacity -= 0.025; 
             }
 
             activeAnimationId = requestAnimationFrame(drawFrame);
         }
 
         const hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
-        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.55, minTrackingConfidence: 0.55 });
         hands.onResults((results) => {
             if (loadingText) loadingText.style.display = 'none';
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                isHandFound = true;
-                const landmarks = results.multiHandLandmarks[0];
-                targetX = (1 - landmarks[8].x) * canvas.width;
-                targetY = landmarks[8].y * canvas.height;
-                const tX = (1 - landmarks[4].x) * canvas.width;
-                const tY = landmarks[4].y * canvas.height;
-                const distance = Math.sqrt(Math.pow(targetX - tX, 2) + Math.pow(targetY - tY, 2));
-                isPinched = distance < 45;
+                isHandFound = true; const landmarks = results.multiHandLandmarks[0];
+                targetX = (1 - landmarks[9].x) * canvas.width; targetY = landmarks[9].y * canvas.height;
+                
+                const isIndexFolded = landmarks[8].y > landmarks[6].y;
+                const isMiddleFolded = landmarks[12].y > landmarks[10].y;
+                const isRingFolded = landmarks[16].y > landmarks[14].y;
+                const isPinkyFolded = landmarks[20].y > landmarks[18].y;
+                isFist = isIndexFolded && isMiddleFolded && isRingFolded && isPinkyFolded;
 
-                if (lastPinchedState === true && isPinched === false && !isExploding) {
-                    if (currentCharge >= 90) explode(targetX, targetY, currentCharge);
-                }
-                lastPinchedState = isPinched;
-            } else {
-                isHandFound = false; isPinched = false; lastPinchedState = false;
-            }
+                if (lastFistState && !isFist && !isExploding && currentCharge >= 90) explode(targetX, targetY, currentCharge);
+                lastFistState = isFist;
+            } else { isHandFound = false; isFist = false; }
         });
-
-        activeCamera = new Camera(video, {
-            onFrame: async () => { await hands.send({ image: video }); }, width: 640, height: 480
-        });
-        activeCamera.start();
-        drawFrame();
-    } 
+        activeCamera = new Camera(video, { onFrame: async () => { await hands.send({ image: video }); }, width: 640, height: 480 });
+        activeCamera.start(); drawFrame();
+    }
     
-    // ------------------------------------------
-    // [Lab 02] 음성 주파수 실시간 시각화 장치 구동
-    // ------------------------------------------
+    // 🎵 [Lab 02] 음성 시각화
     else if (type === 'voice') {
         container.innerHTML = `
-            <div id="audioLoading" style="position:absolute; color:#034694; font-family:sans-serif; font-size:1rem; font-weight:bold; letter-spacing:1px; z-index:10;">REQUESTING MICROPHONE PERMISSION...</div>
-            <div style="position:absolute; top:20px; left:20px; color:rgba(255,255,255,0.4); font-family:sans-serif; font-size:0.85rem; z-index:10; pointer-events:none; line-height:1.5;">
-                [파동 분석 실험실]<br>
-                - 마이크 권한 승인 후 말을 하거나 휘파람을 불어보세요.<br>
-                - 오디오 주파수(Hz) 성분을 실시간 추출하여 시각적 파형으로 렌더링합니다.
+            <div id="audioLoading" style="position:absolute; color:#00d2ff; font-family:sans-serif; font-size:0.9rem; font-weight:bold; z-index:10;">OPENING SOUND FREQUENCY INTERFACE...</div>
+            <canvas id="audioCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:5; background:#020207;"></canvas>
+            <div id="freqMonitor" style="position:absolute; bottom:20px; left:5%; width:90%; height:55px; z-index:10; display:flex; justify-content:space-around; align-items:center; background:rgba(5,9,24,0.85); border:1px solid rgba(0,210,255,0.25); border-radius:12px; backdrop-filter:blur(6px); font-family:monospace; font-size:0.75rem; color:#00d2ff; padding: 0 10px;">
+                <div style="width:30%; text-align:center;">
+                    <div style="color:rgba(255,255,255,0.4); margin-bottom:3px;">BASS (저음역)</div>
+                    <div id="barBass" style="width:0%; height:5px; background:#0055ff; border-radius:3px; margin:2px auto; transition: width 0.05s;"></div>
+                    <span id="txtBass">0 Hz</span>
+                </div>
+                <div style="width:1px; height:30px; background:rgba(0,210,255,0.2);"></div>
+                <div style="width:30%; text-align:center;">
+                    <div style="color:rgba(255,255,255,0.4); margin-bottom:3px;">MID (중음역)</div>
+                    <div id="barMid" style="width:0%; height:5px; background:#0099ff; border-radius:3px; margin:2px auto; transition: width 0.05s;"></div>
+                    <span id="txtMid">0 Hz</span>
+                </div>
+                <div style="width:1px; height:30px; background:rgba(0,210,255,0.2);"></div>
+                <div style="width:30%; text-align:center;">
+                    <div style="color:rgba(255,255,255,0.4); margin-bottom:3px;">TREBLE (고음역)</div>
+                    <div id="barTreble" style="width:0%; height:5px; background:#00e5ff; border-radius:3px; margin:2px auto; transition: width 0.05s;"></div>
+                    <span id="txtTreble">0 Hz</span>
+                </div>
             </div>
-            <canvas id="audioCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:5; background:#020202;"></canvas>
         `;
-
-        const canvas = document.getElementById('audioCanvas');
-        const ctx = canvas.getContext('2d');
-        const loadingText = document.getElementById('audioLoading');
-
-        canvas.width = container.clientWidth;
-        canvas.height = container.clientHeight;
-
-        navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-            .then(function(stream) {
-                if (loadingText) loadingText.style.display = 'none';
-                activeAudioStream = stream;
-
-                activeAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const source = activeAudioContext.createMediaStreamSource(stream);
-                const analyzer = activeAudioContext.createAnalyser();
+        injectHelpButton(container, spec.guide);
+        
+        const canvas = document.getElementById('audioCanvas'); const ctx = canvas.getContext('2d');
+        const bBass = document.getElementById('barBass'); const tBass = document.getElementById('txtBass');
+        const bMid = document.getElementById('barMid'); const tMid = document.getElementById('txtMid');
+        const bTreble = document.getElementById('barTreble'); const tTreble = document.getElementById('txtTreble');
+        
+        canvas.width = container.clientWidth; canvas.height = container.clientHeight;
+        
+        navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function(stream) {
+            document.getElementById('audioLoading').style.display = 'none'; activeAudioStream = stream;
+            activeAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const source = activeAudioContext.createMediaStreamSource(stream);
+            
+            const analyzer = activeAudioContext.createAnalyser(); 
+            analyzer.fftSize = 1024;
+            const bufferLength = analyzer.frequencyBinCount; 
+            const timeData = new Uint8Array(bufferLength);
+            const freqData = new Uint8Array(bufferLength); 
+            source.connect(analyzer);
+            
+            function drawAudio() {
+                activeAnimationId = requestAnimationFrame(drawAudio); 
+                analyzer.getByteTimeDomainData(timeData);
+                analyzer.getByteFrequencyData(freqData);
                 
-                analyzer.fftSize = 1024; 
-                const bufferLength = analyzer.frequencyBinCount;
-                const timeDataArray = new Uint8Array(bufferLength);      
-                const frequencyDataArray = new Uint8Array(bufferLength); 
-
-                source.connect(analyzer);
-
-                function drawAudioFrame() {
-                    activeAnimationId = requestAnimationFrame(drawAudioFrame);
-                    
-                    analyzer.getByteTimeDomainData(timeDataArray);
-                    analyzer.getByteFrequencyData(frequencyDataArray);
-
-                    ctx.fillStyle = 'rgba(2, 2, 2, 0.2)';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                    ctx.lineWidth = 1;
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
-                    ctx.beginPath();
-                    ctx.moveTo(0, canvas.height / 2);
-                    ctx.lineTo(canvas.width, canvas.height / 2);
-                    ctx.stroke();
-
-                    ctx.lineWidth = 3;
-                    ctx.strokeStyle = '#034694';
-                    ctx.shadowBlur = 18;
-                    ctx.shadowColor = '#38bdf8';
-                    ctx.beginPath();
-
-                    const sliceWidth = canvas.width / bufferLength;
-                    let x = 0;
-
-                    for (let i = 0; i < bufferLength; i++) {
-                        const v = timeDataArray[i] / 128.0; 
-                        const y = (v * canvas.height) / 2;
-
-                        if (i === 0) ctx.moveTo(x, y);
-                        else ctx.lineTo(x, y);
-
-                        x += sliceWidth;
-                    }
-                    ctx.lineTo(canvas.width, canvas.height / 2);
-                    ctx.stroke();
-
-                    ctx.shadowBlur = 0; 
-                    const barWidth = (canvas.width / bufferLength) * 2.5;
-                    let barX = 0;
-
-                    for (let i = 0; i < bufferLength; i++) {
-                        const fraction = frequencyDataArray[i] / 255;
-                        const barHeight = fraction * canvas.height * 0.45; 
-
-                        ctx.fillStyle = `hsla(${210 + fraction * 60}, 95%, 50%, 0.15)`;
-                        ctx.fillRect(barX, canvas.height - barHeight, barWidth - 1, barHeight);
-                        ctx.fillRect(barX, 0, barWidth - 1, barHeight * 0.4);
-
-                        barX += barWidth + 1;
-                        if (barX > canvas.width) break; 
-                    }
+                ctx.fillStyle = 'rgba(2, 2, 7, 0.28)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.lineWidth = 3; ctx.strokeStyle = '#0066ff'; ctx.shadowColor = '#00a3ff'; ctx.shadowBlur = 6;
+                ctx.beginPath();
+                let slice = canvas.width / bufferLength; let x = 0;
+                for(let i=0; i<bufferLength; i++) {
+                    let y = (timeData[i]/128.0)*(canvas.height / 2.3); 
+                    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); x+=slice;
                 }
+                ctx.lineTo(canvas.width, canvas.height/2.3); ctx.stroke(); ctx.shadowBlur = 0;
 
-                drawAudioFrame();
-            })
-            .catch(function(err) {
-                if (loadingText) {
-                    loadingText.style.color = '#ff0055';
-                    loadingText.innerText = 'MICROPHONE ACCESS DENIED OR NOT FOUND.';
+                let bassSum = 0, midSum = 0, trebleSum = 0;
+                let bassCount = 0, midCount = 0, trebleCount = 0;
+                
+                for (let i = 0; i < bufferLength; i++) {
+                    if (i < 40) { bassSum += freqData[i]; bassCount++; }
+                    else if (i >= 40 && i < 280) { midSum += freqData[i]; midCount++; }
+                    else { trebleSum += freqData[i]; trebleCount++; }
                 }
-                console.log('Audio lab error: ' + err);
-            });
-    } 
+                
+                let avgBass = bassSum / bassCount;
+                let avgMid = midSum / midCount;
+                let avgTreble = trebleSum / trebleCount;
+
+                bBass.style.width = `${Math.min(100, (avgBass/255)*100)}%`; tBass.innerText = `${Math.floor(avgBass * 3.5)} Hz`;
+                bMid.style.width = `${Math.min(100, (avgMid/255)*100)}%`; tMid.innerText = `${Math.floor(avgMid * 12 + 250)} Hz`;
+                bTreble.style.width = `${Math.min(100, (avgTreble/255)*100)}%`; tTreble.innerText = `${Math.floor(avgTreble * 40 + 2000)} Hz`;
+            }
+            drawAudio();
+        }).catch(err => console.log(err));
+    }
     
-    // ------------------------------------------
-    // [Lab 03] AI 손가락 제스처 모래성 시뮬레이션 (모래 크기 대폭 상향 튜닝 버전)
-    // ------------------------------------------
+    // ⏳ [Lab 03] 모래성 시뮬레이터
     else if (type === 'sand') {
         container.innerHTML = `
-            <div id="loadingText" style="position:absolute; color:#034694; font-family:sans-serif; font-size:1rem; font-weight:bold; letter-spacing:1px; z-index:10;">INITIALIZING HEAVY SAND ENGINE...</div>
-            <div style="position:absolute; top:20px; left:20px; color:rgba(255,255,255,0.4); font-family:sans-serif; font-size:0.85rem; z-index:10; pointer-events:none; line-height:1.5;">
-                [제스처 가이드]<br>
-                - 손가락을 움직이면 커서가 따라 이동합니다.<br>
-                - 엄지와 검지를 <span style="color:#38bdf8; font-weight:bold;">오므려 핀치(Pinch)</span>하면 손끝에서 큼직한 모래 폭포가 우르르 쏟아집니다!<br>
-                - 중력 가속도가 강화되어 모래성이 훨씬 박진감 있게 쌓입니다.
-            </div>
-            <video id="labWebcam" autoplay playsinline style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:1; transform: scaleX(-1); z-index:2; pointer-events:none;"></video>
+            <div id="loadingText" style="position:absolute; color:#00ffaa; font-family:sans-serif; font-size:0.9rem; font-weight:bold; z-index:10;">ENGAGING AURORA GRAVITY ENGINE...</div>
+            <video id="labWebcam" autoplay playsinline style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.12; transform: scaleX(-1); z-index:2; pointer-events:none;"></video>
             <canvas id="sandCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:5; background:transparent;"></canvas>
         `;
-
-        const canvas = document.getElementById('sandCanvas');
-        const ctx = canvas.getContext('2d');
-        const video = document.getElementById('labWebcam');
-        const loadingText = document.getElementById('loadingText');
-
-        canvas.width = container.clientWidth;
-        canvas.height = container.clientHeight;
-
-        // ★★★ 모래 크기 튜닝: 스케일을 2에서 4로 대폭 확장 ★★★
-        const scale = 4; 
-        const cols = Math.floor(canvas.width / scale);
-        const rows = Math.floor(canvas.height / scale);
+        injectHelpButton(container, spec.guide);
         
+        const canvas = document.getElementById('sandCanvas'); const ctx = canvas.getContext('2d'); const video = document.getElementById('labWebcam');
+        canvas.width = container.clientWidth; canvas.height = container.clientHeight;
+        const scale = 5; 
+        const cols = Math.floor(canvas.width / scale); const rows = Math.floor(canvas.height / scale);
         let grid = new Array(cols).fill(null).map(() => new Array(rows).fill(0));
         let gridColor = new Array(cols).fill(null).map(() => new Array(rows).fill(''));
+        let targetX = canvas.width / 2; let targetY = canvas.height / 2; let isHandFound = false; let isPinched = false;
 
-        let targetX = canvas.width / 2;
-        let targetY = canvas.height / 2;
-        let isHandFound = false;
-        let isPinched = false;
-
-        function updateSandEngine() {
+        function updateSand() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // 1. 핀치 중일 때 모래 대량 살포 (한 번에 6개 -> 18개로 스폰량 3배 상향)
             if (isHandFound && isPinched) {
-                const pX = Math.floor(targetX / scale);
-                const pY = Math.floor(targetY / scale);
-                
-                for(let k = 0; k < 18; k++) { 
-                    const rX = pX + Math.floor((Math.random() - 0.5) * 10);
-                    const rY = pY + Math.floor((Math.random() - 0.5) * 10);
-                    
-                    if (rX >= 0 && rX < cols && rY >= 0 && rY < rows) {
-                        if (grid[rX][rY] === 0) {
-                            grid[rX][rY] = 1;
-                            gridColor[rX][rY] = `hsl(${Math.random() * 20 + 205}, 95%, ${Math.random() * 25 + 45}%)`;
-                        }
+                const pX = Math.floor(targetX / scale); const pY = Math.floor(targetY / scale);
+                for(let k = 0; k < 12; k++) {
+                    const rX = pX + Math.floor((Math.random() - 0.5) * 8); const rY = pY + Math.floor((Math.random() - 0.5) * 8);
+                    if (rX >= 0 && rX < cols && rY >= 0 && rY < rows && grid[rX][rY] === 0) {
+                        grid[rX][rY] = 1; 
+                        const hue = Math.random() < 0.4 ? Math.random() * 40 + 180 : (Math.random() * 50 + 260);
+                        gridColor[rX][rY] = `hsla(${hue}, 100%, 65%, 0.95)`;
                     }
                 }
             }
-
-            // 2. 고속 중력 적치 연산 파트 (역방향 루프)
             let nextGrid = new Array(cols).fill(null).map(() => new Array(rows).fill(0));
             let nextColor = new Array(cols).fill(null).map(() => new Array(rows).fill(''));
-
             for (let x = 0; x < cols; x++) {
                 for (let y = 0; y < rows; y++) {
                     if (grid[x][y] === 1) {
-                        let currentC = gridColor[x][y];
-                        
-                        if (y === rows - 1) {
-                            nextGrid[x][y] = 1;
-                            nextColor[x][y] = currentC;
-                            continue;
-                        }
-
-                        // ★★★ 중력 가속 속도 인자 강화 연산 ★★★
-                        // 직하강 라인을 더 묵직하게 우선 연산
-                        let below = y + 1;
-                        let dir = Math.random() < 0.5 ? 1 : -1; 
-
-                        if (grid[x][below] === 0) {
-                            nextGrid[x][below] = 1;
-                            nextColor[x][below] = currentC;
-                        } else if (x + dir >= 0 && x + dir < cols && grid[x + dir][below] === 0) {
-                            nextGrid[x + dir][below] = 1;
-                            nextColor[x + dir][below] = currentC;
-                        } else if (x - dir >= 0 && x - dir < cols && grid[x - dir][below] === 0) {
-                            nextGrid[x - dir][below] = 1;
-                            nextColor[x - dir][below] = currentC;
-                        } else {
-                            nextGrid[x][y] = 1;
-                            nextColor[x][y] = currentC;
-                        }
+                        let currentC = gridColor[x][y]; if (y === rows - 1) { nextGrid[x][y] = 1; nextColor[x][y] = currentC; continue; }
+                        let below = y + 1; let dir = Math.random() < 0.5 ? 1 : -1;
+                        if (grid[x][below] === 0) { nextGrid[x][below] = 1; nextColor[x][below] = currentC; } 
+                        else if (x + dir >= 0 && x + dir < cols && grid[x + dir][below] === 0) { nextGrid[x + dir][below] = 1; nextColor[x + dir][below] = currentC; } 
+                        else if (x - dir >= 0 && x - dir < cols && grid[x - dir][below] === 0) { nextGrid[x - dir][below] = 1; nextColor[x - dir][below] = currentC; } 
+                        else { nextGrid[x][y] = 1; nextColor[x][y] = currentC; }
                     }
                 }
             }
-            grid = nextGrid;
-            gridColor = nextColor;
-
-            // 3. 커진 그리드 화면 렌더링
+            grid = nextGrid; gridColor = nextColor;
+            
             for (let x = 0; x < cols; x++) {
                 for (let y = 0; y < rows; y++) {
-                    if (grid[x][y] === 1) {
-                        ctx.fillStyle = gridColor[x][y];
-                        // 스케일 변화에 맞춰 입자 크기를 맞춰 꽉 채움
-                        ctx.fillRect(x * scale, y * scale, scale - 0.5, scale - 0.5); 
+                    if (grid[x][y] === 1) { 
+                        ctx.beginPath();
+                        const cx = x * scale + scale / 2;
+                        const cy = y * scale + scale / 2;
+                        ctx.arc(cx, cy, (scale / 2) - 0.2, 0, Math.PI * 2);
+                        ctx.fillStyle = gridColor[x][y]; 
+                        ctx.fill(); 
                     }
                 }
             }
-
-            // 4. 가이드 조준선 UI 동적 변화
-            if (isHandFound) {
-                ctx.beginPath();
-                ctx.arc(targetX, targetY, isPinched ? 24 : 14, 0, Math.PI * 2);
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = isPinched ? '#38bdf8' : 'rgba(255,255,255,0.5)';
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.arc(targetX, targetY, 5, 0, Math.PI * 2);
-                ctx.fillStyle = isPinched ? '#38bdf8' : '#ffffff';
-                ctx.fill();
+            if (isHandFound) { 
+                ctx.beginPath(); ctx.arc(targetX, targetY, isPinched ? 18 : 12, 0, Math.PI * 2); 
+                ctx.lineWidth = 2; ctx.strokeStyle = '#00ffaa'; ctx.stroke(); 
             }
+            activeAnimationId = requestAnimationFrame(updateSand);
+        }
+        const hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
+        hands.onResults((results) => {
+            document.getElementById('loadingText').style.display = 'none';
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                isHandFound = true; const landmarks = results.multiHandLandmarks[0];
+                targetX = (1 - landmarks[8].x) * canvas.width; targetY = landmarks[8].y * canvas.height;
+                const distance = Math.sqrt(Math.pow(targetX - (1 - landmarks[4].x) * canvas.width, 2) + Math.pow(targetY - landmarks[4].y * canvas.height, 2));
+                isPinched = distance < 45;
+            } else { isHandFound = false; isPinched = false; }
+        });
+        activeCamera = new Camera(video, { onFrame: async () => { await hands.send({ image: video }); }, width: 640, height: 480 });
+        activeCamera.start(); updateSand();
+    }
 
-            activeAnimationId = requestAnimationFrame(updateSandEngine);
+    // 🤖 [Lab 04] JARVIS 가상 홀로그램 입체 연성소
+    else if (type === 'three3d') {
+        container.innerHTML = `
+            <div id="loadingText" style="position:absolute; color:#00d2ff; font-family:sans-serif; font-size:0.9rem; font-weight:bold; z-index:10; pointer-events:none; text-shadow:0 0 10px #00d2ff;">JARVIS NEURAL CORE ONLINE...</div>
+            <div id="shapeMenu" style="position:absolute; top:20px; right:20px; background:rgba(6,12,28,0.85); padding:14px 20px; border-radius:12px; border:1px solid rgba(0,210,255,0.4); color:#fff; font-family:sans-serif; font-size:0.85rem; z-index:10; box-shadow:0 0 20px rgba(0,210,255,0.25); backdrop-filter:blur(8px);">
+                <span style="color:rgba(255,255,255,0.5); font-weight:bold; font-size:0.75rem;">GEOMETRY CORE:</span> <span id="currentShapeText" style="color:#00d2ff; font-weight:bold; letter-spacing:1px;">CUBE</span><br>
+                <div id="selectGauge" style="width:100%; height:4px; background:rgba(255,255,255,0.1); margin:6px 0 8px 0; border-radius:2px; overflow:hidden;"><div id="selectBar" style="width:0%; height:100%; background:linear-gradient(90deg, #00d2ff, #00ffaa); transition: width 0.08s;"></div></div>
+                <span id="jarvisScaleText" style="color:#ffaa00; font-size:0.75rem; display:block; font-weight:bold;">Object Count: 0</span>
+                <div id="wipeGauge" style="width:100%; height:5px; background:rgba(255,255,255,0.1); margin-top:8px; display:none; border-radius:2px; overflow:hidden;"><div id="wipeBar" style="width:0%; height:100%; background:linear-gradient(90deg, #ef4444, #ff0055);"></div></div>
+            </div>
+            <video id="labWebcam" autoplay playsinline style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.22; transform: scaleX(-1); z-index:2; pointer-events:none;"></video>
+            <div id="threeCanvasContainer" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:5;"></div>
+            <canvas id="jarvisOverlayCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:6; background:transparent; pointer-events:none;"></canvas>
+        `;
+        injectHelpButton(container, spec.guide);
+
+        const video = document.getElementById('labWebcam');
+        const threeContainer = document.getElementById('threeCanvasContainer');
+        const overlayCanvas = document.getElementById('jarvisOverlayCanvas');
+        const ctxOverlay = overlayCanvas.getContext('2d');
+        const shapeText = document.getElementById('currentShapeText');
+        const scaleText = document.getElementById('jarvisScaleText');
+        const loadingText = document.getElementById('loadingText');
+        const wipeGauge = document.getElementById('wipeGauge');
+        const wipeBar = document.getElementById('wipeBar');
+        const selectBar = document.getElementById('selectBar');
+
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        overlayCanvas.width = width;
+        overlayCanvas.height = height;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        camera.position.set(0, 0, 40);
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        threeContainer.appendChild(renderer.domElement);
+        threeRenderer = renderer;
+
+        scene.add(new THREE.AmbientLight(0x223344));
+        const pLight = new THREE.PointLight(0x00d2ff, 3, 300);
+        pLight.position.set(0, 30, 50);
+        scene.add(pLight);
+
+        let createdObjects = [];
+        let currentShapeMode = 'CUBE';
+        let latestMesh = null; 
+
+        let baseSingleHandX = null;
+        let baseMeshScale = 1.0;
+
+        let openHandStartTime = null;
+        let shapeSelectStartTime = null;
+        let pendingShapeMode = null;
+
+        let lastPinchState = false;
+        let lastPinchTime = 0;
+
+        function loopJARVIS() {
+            activeAnimationId = requestAnimationFrame(loopJARVIS);
+            createdObjects.forEach(mesh => {
+                mesh.rotation.x += 0.003;
+                mesh.rotation.y += 0.005;
+            });
+            renderer.render(scene, camera);
+        }
+
+        function createCentralHologram(sX, sY) {
+            const vec = new THREE.Vector3((sX / width) * 2 - 1, -(sY / height) * 2 + 1, 0.5);
+            vec.unproject(camera);
+            const dir = vec.sub(camera.position).normalize();
+            const dist = -camera.position.z / dir.z;
+            const pos = camera.position.clone().add(dir.multiplyScalar(dist));
+
+            let geo;
+            if (currentShapeMode === 'CUBE') geo = new THREE.BoxGeometry(3.5, 3.5, 3.5);
+            else if (currentShapeMode === 'SPHERE') geo = new THREE.SphereGeometry(2.5, 24, 24);
+            else if (currentShapeMode === 'TORUS') geo = new THREE.TorusGeometry(2.0, 0.6, 12, 32);
+
+            const mat = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(currentShapeMode === 'CUBE' ? 0x00d2ff : (currentShapeMode === 'SPHERE' ? 0xa855f7 : 0x00ffaa)),
+                wireframe: true,
+                transparent: true,
+                opacity: 0.85
+            });
+
+            const newMesh = new THREE.Mesh(geo, mat);
+            newMesh.position.set(pos.x, pos.y, 0);
+            scene.add(newMesh);
+            
+            createdObjects.push(newMesh);
+            latestMesh = newMesh; 
+            scaleText.innerText = `Object Count: ${createdObjects.length}`;
         }
 
         const hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
-        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
-        
+        hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
+
         hands.onResults((results) => {
             if (loadingText) loadingText.style.display = 'none';
+            ctxOverlay.clearRect(0, 0, width, height);
+
+            let detectedHands = [];
+            let totalOpenHands = 0;
+            let currentDetectedFingers = null;
+
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                isHandFound = true;
-                const landmarks = results.multiHandLandmarks[0];
-                
-                targetX = (1 - landmarks[8].x) * canvas.width;
-                targetY = landmarks[8].y * canvas.height;
-                
-                const thumbX = (1 - landmarks[4].x) * canvas.width;
-                const thumbY = landmarks[4].y * canvas.height;
-                
-                const distance = Math.sqrt(Math.pow(targetX - thumbX, 2) + Math.pow(targetY - thumbY, 2));
-                isPinched = distance < 50; // 커진 입자 크기에 맞춰 판정 영역도 소폭 확대
+                for (let i = 0; i < results.multiHandLandmarks.length; i++) {
+                    const marks = results.multiHandLandmarks[i];
+                    
+                    const idxX = (1 - marks[8].x) * width;
+                    const idxY = marks[8].y * height;
+                    const thmX = (1 - marks[4].x) * width;
+                    const thmY = marks[4].y * height;
+                    
+                    const selfPinchDist = Math.sqrt(Math.pow(idxX - thmX, 2) + Math.pow(idxY - thmY, 2));
+                    const isSelfPinch = selfPinchDist < 45;
+
+                    const isIndexOpen = marks[8].y < marks[6].y;
+                    const isMiddleOpen = marks[12].y < marks[10].y;
+                    const isRingOpen = marks[16].y < marks[14].y;
+                    const isPinkyOpen = marks[20].y < marks[18].y;
+                    
+                    let fingerCount = 0;
+                    if (isIndexOpen) fingerCount++;
+                    if (isMiddleOpen) fingerCount++;
+                    if (isRingOpen) fingerCount++;
+                    if (isPinkyOpen) fingerCount++;
+
+                    if (fingerCount >= 3 && !isSelfPinch) {
+                        totalOpenHands++;
+                    }
+
+                    detectedHands.push({ idxX, idxY, isSelfPinch, fingerCount });
+
+                    ctxOverlay.beginPath();
+                    ctxOverlay.arc(idxX, idxY, isSelfPinch ? 22 : 12, 0, Math.PI * 2);
+                    ctxOverlay.lineWidth = 2;
+                    ctxOverlay.strokeStyle = isSelfPinch ? '#ffaa00' : '#00d2ff';
+                    ctxOverlay.stroke();
+                    
+                    if (!isSelfPinch && fingerCount >= 1 && fingerCount <= 3) {
+                        currentDetectedFingers = fingerCount;
+                    }
+                }
+
+                const anyHandPinching = detectedHands.some(h => h.isSelfPinch);
+
+                if (totalOpenHands > 0 && !anyHandPinching) {
+                    if (openHandStartTime === null) {
+                        openHandStartTime = Date.now();
+                        wipeGauge.style.display = 'block';
+                    } else {
+                        const elapsed = Date.now() - openHandStartTime;
+                        const progress = Math.min(100, (elapsed / 3000) * 100);
+                        wipeBar.style.width = `${progress}%`;
+
+                        if (elapsed >= 3000) { 
+                            createdObjects.forEach(obj => scene.remove(obj));
+                            createdObjects = [];
+                            latestMesh = null;
+                            scaleText.innerText = `Object Count: 0`;
+                            openHandStartTime = null;
+                            wipeGauge.style.display = 'none';
+                            ctxOverlay.fillStyle = 'rgba(239, 68, 68, 0.25)';
+                            ctxOverlay.fillRect(0, 0, width, height);
+                        }
+                    }
+                } else {
+                    openHandStartTime = null;
+                    wipeGauge.style.display = 'none';
+                    wipeBar.style.width = '0%';
+                }
+
+                if (detectedHands.length === 1) {
+                    const primaryHand = detectedHands[0];
+                    const now = Date.now();
+
+                    if (primaryHand.isSelfPinch && !lastPinchState) {
+                        if (now - lastPinchTime < 350) { 
+                            createCentralHologram(primaryHand.idxX, primaryHand.idxY);
+                            ctxOverlay.beginPath();
+                            ctxOverlay.arc(primaryHand.idxX, primaryHand.idxY, 50, 0, Math.PI * 2);
+                            ctxOverlay.lineWidth = 4;
+                            ctxOverlay.strokeStyle = '#00ffff';
+                            ctxOverlay.stroke();
+                            lastPinchTime = 0;
+                        } else {
+                            lastPinchTime = now;
+                        }
+                    }
+                    lastPinchState = primaryHand.isSelfPinch;
+
+                    if (primaryHand.isSelfPinch) {
+                        pendingShapeMode = null;
+                        shapeSelectStartTime = null;
+                        selectBar.style.width = '0%';
+                        
+                        if (latestMesh) {
+                            const currentX = primaryHand.idxX;
+                            if (baseSingleHandX === null) {
+                                baseSingleHandX = currentX;
+                                baseMeshScale = latestMesh.scale.x;
+                            } else {
+                                const deltaX = currentX - baseSingleHandX;
+                                const computedScale = baseMeshScale + (deltaX * 0.008);
+                                const finalScale = Math.max(0.2, Math.min(5.0, computedScale));
+                                latestMesh.scale.set(finalScale, finalScale, finalScale);
+                            }
+                        }
+                    } 
+                    else {
+                        baseSingleHandX = null;
+                        if (currentDetectedFingers !== null) {
+                            let targetMode = 'CUBE';
+                            if (currentDetectedFingers === 1) targetMode = 'CUBE';
+                            else if (currentDetectedFingers === 2) targetMode = 'SPHERE';
+                            else if (currentDetectedFingers === 3) targetMode = 'TORUS';
+
+                            if (pendingShapeMode !== targetMode) {
+                                pendingShapeMode = targetMode;
+                                shapeSelectStartTime = now;
+                            } else {
+                                const selectElapsed = now - shapeSelectStartTime;
+                                const selectProgress = Math.min(100, (selectElapsed / 1000) * 100);
+                                selectBar.style.width = `${selectProgress}%`;
+
+                                if (selectElapsed >= 1000) { 
+                                    currentShapeMode = pendingShapeMode;
+                                    if (currentShapeMode === 'CUBE') { shapeText.innerText = 'CUBE'; shapeText.style.color = '#00d2ff'; }
+                                    else if (currentShapeMode === 'SPHERE') { shapeText.innerText = 'SPHERE'; shapeText.style.color = '#a855f7'; }
+                                    else if (currentShapeMode === 'TORUS') { shapeText.innerText = 'TORUS (DONUT)'; shapeText.style.color = '#00ffaa'; }
+                                    shapeSelectStartTime = null;
+                                    selectBar.style.width = '0%';
+                                }
+                            }
+                        } else {
+                            pendingShapeMode = null;
+                            shapeSelectStartTime = null;
+                            selectBar.style.width = '0%';
+                        }
+                    }
+                } 
+                else if (detectedHands.length === 2) {
+                    lastPinchState = false;
+                    baseSingleHandX = null;
+                    pendingShapeMode = null;
+                    shapeSelectStartTime = null;
+                    selectBar.style.width = '0%';
+                }
             } else {
-                isHandFound = false; isPinched = false;
+                lastPinchState = false;
+                openHandStartTime = null;
+                shapeSelectStartTime = null;
+                wipeGauge.style.display = 'none';
+                selectBar.style.width = '0%';
             }
         });
 
@@ -571,13 +710,10 @@ function startLab(type) {
             onFrame: async () => { await hands.send({ image: video }); }, width: 640, height: 480
         });
         activeCamera.start();
-        updateSandEngine();
+        loopJARVIS();
     }
 }
 
-// ==========================================
-// 5. 창 해상도 변화 리사이즈 감지
-// ==========================================
 window.addEventListener('resize', () => {
     stars.forEach(star => {
         star.x = (parseFloat(star.el.style.left) / 100) * window.innerWidth;
