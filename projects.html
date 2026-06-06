@@ -7,7 +7,6 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
@@ -17,48 +16,17 @@
         .star { position: absolute; background-color: rgba(255, 255, 255, 0.3); border-radius: 50%; transition: background-color 0.3s, transform 0.3s; }
         .star.bright { background-color: #034694; transform: scale(2.5); box-shadow: 0 0 8px #034694; }
         
-        /* 🔴 스크린샷 기반 상단 내비게이션 바 헤더 스타일 포맷 */
-        header.site-header {
-            position: relative;
-            z-index: 10;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 40px 60px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header-logo {
-            font-size: 1.4rem;
-            font-weight: 900;
-            color: #fff;
-            text-decoration: none;
-            letter-spacing: 1px;
-        }
-        .header-nav {
-            display: flex;
-            gap: 35px;
-        }
-        .header-nav a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            opacity: 0.6;
-            transition: opacity 0.3s;
-        }
-        .header-nav a:hover, .header-nav a.active {
-            opacity: 1;
-        }
+        header.site-header { position: relative; z-index: 10; max-width: 1400px; margin: 0 auto; padding: 40px 60px; display: flex; justify-content: space-between; align-items: center; }
+        .header-logo { font-size: 1.4rem; font-weight: 900; color: #fff; text-decoration: none; letter-spacing: 1px; }
+        .header-nav { display: flex; gap: 35px; }
+        .header-nav a { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.6; transition: opacity 0.3s; }
+        .header-nav a:hover, .header-nav a.active { opacity: 1; }
 
-        /* 메인 타이틀 장식 */
         .page-title-section { position: relative; z-index: 2; max-width: 1400px; margin: 0 auto; padding: 20px 60px; }
         .page-title-section h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 10px; background: linear-gradient(135deg, #fff 0%, #888 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .page-title-section p { color: #666; font-size: 1rem; }
 
-        main { position: relative; z-index: 2; max-width: 1400px; margin: 0 auto; padding: 20px 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; min-height: 80vh; }
+        main { position: relative; z-index: 2; max-width: 1400px; margin: 0 auto; padding: 20px 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; min-height: 70vh; }
         .card { background: rgba(20, 20, 20, 0.6); border: 1px solid #1a1a1a; border-radius: 12px; padding: 30px; cursor: pointer; transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
         .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(3,70,148,0.1) 0%, transparent 100%); opacity: 0; transition: 0.3s; }
         .card:hover { transform: translateY(-5px); border-color: #034694; box-shadow: 0 10px 30px rgba(3, 70, 148, 0.2); }
@@ -71,7 +39,6 @@
         .card-footer span { transition: transform 0.3s; }
         .card:hover .card-footer span { transform: translateX(5px); }
 
-        /* 모달 윈도우 스타일 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 100; backdrop-filter: blur(10px); animation: fadeIn 0.25s ease-out; }
         .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 900px; height: 85vh; background-color: #0a0a0a; border: 1px solid #222; border-radius: 16px; padding: 40px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
         .close-btn { position: absolute; top: 25px; right: 30px; font-size: 2rem; color: #666; cursor: pointer; transition: 0.2s; z-index: 101; }
@@ -80,40 +47,31 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* ─── 📱 모바일 세로 화면 메뉴 정렬 (IZDHFS 로고 밑으로 이동) ─── */
         @media (max-width: 768px) {
-            header.site-header {
-                flex-direction: column !important; /* 위아래 세로 배치 */
-                gap: 15px !important;              /* 로고와 메뉴 사이 간격 */
-                padding: 20px 10px !important;     /* 모바일 여백 조절 */
-                text-align: center !important;
-                display: flex !important;
-                align-items: center !important;
-            }
-
-            .header-nav {
-                display: flex !important;
-                width: 100% !important;
-                justify-content: center !important; /* 메뉴 가로 중앙 정렬 */
-                gap: 15px !important;               /* 메뉴 아이템 간 간격 */
-            }
-
-            .header-nav a {
-                font-size: 0.8rem !important;       /* 글씨 크기 축소 */
-                letter-spacing: 0.5px !important;
-                white-space: nowrap !important;      /* 줄바꿈 방지 */
-                opacity: 0.8 !important;            /* 모바일에서 가독성 위해 살짝 진하게 */
-            }
+            header.site-header { flex-direction: column !important; gap: 15px !important; padding: 20px 10px !important; text-align: center !important; display: flex !important; align-items: center !important; }
+            .header-nav { display: flex !important; width: 100% !important; justify-content: center !important; gap: 15px !important; }
+            .header-nav a { font-size: 0.8rem !important; letter-spacing: 0.5px !important; white-space: nowrap !important; opacity: 0.8 !important; }
         }
 
-        /* 아주 좁은 화면 대응 */
-        @media (max-width: 380px) {
-            .header-nav {
-                gap: 10px !important;
-            }
-            .header-nav a {
-                font-size: 0.75rem !important;
-            }
+        /* 🤫 비밀 버튼 스타일 */
+        .secret-btn-container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 40px 0 60px 0;
+        }
+        .secret-btn {
+            background: none;
+            border: none;
+            color: #1a1a1a; /* 배경과 비슷하게 어둡게 숨김 */
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+        .secret-btn:hover {
+            color: #00ffaa; /* 마우스 올리면 네온 그린으로 발광 */
+            text-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
         }
     </style>
 </head>
@@ -125,8 +83,8 @@
         <a href="index.html" class="header-logo">IZDHFS</a>
         <nav class="header-nav">
             <a href="index.html">HOME</a>
-            <a href="#personal">PERSONAL</a>
-            <a href="#academic">ACADEMIC</a>
+            <a href="personal.html">PERSONAL</a>
+            <a href="#academic.html">ACADEMIC</a>
             <a href="projects.html" class="active">PROJECTS</a>
         </nav>
     </header>
@@ -137,33 +95,6 @@
     </div>
 
     <main>
-        <div class="card" onclick="openModal('luminol')">
-            <div>
-                <div class="card-tag">Research Experiment</div>
-                <h3>루미놀 용액 반응<br>과학 탐구 실험</h3>
-                <p>철 촉매와 활성화 에너지 원리를 활용한 과학수사 기법 분석 및 정밀 실험 설계 실적.</p>
-            </div>
-            <div class="card-footer">자세히 보기 <span>→</span></div>
-        </div>
-
-        <div class="card" onclick="openModal('spectroscopy')">
-            <div>
-                <div class="card-tag">Physics Lab</div>
-                <h3>기초 분광학<br>광학 스펙트럼 분석</h3>
-                <p>빛의 회절과 파장 관측을 통해 물질의 고유 성분을 추적하는 분광 광학 실험.</p>
-            </div>
-            <div class="card-footer">자세히 보기 <span>→</span></div>
-        </div>
-
-        <div class="card" onclick="openModal('debate')">
-            <div>
-                <div class="card-tag">Competition</div>
-                <h3>교내 과학토론대회<br>우수 수상 실적</h3>
-                <p>현대 과학 이슈에 대한 다각도 논리 전개 및 기술 해결 대안 제시 토론 실적.</p>
-            </div>
-            <div class="card-footer">자세히 보기 <span>→</span></div>
-        </div>
-
         <div class="card interactive" onclick="openModal('interactive_galaxy')">
             <div>
                 <div class="card-tag">Interactive Lab 01</div>
@@ -199,7 +130,20 @@
             </div>
             <div class="card-footer" style="color:#00d2ff;">실험실 입장 <span>→</span></div>
         </div>
+
+        <div class="card interactive" onclick="openModal('interactive_dynamic_text')">
+            <div>
+                <div class="card-tag">Interactive Lab 05</div>
+                <h3>가상 제스처 공간<br>동적 텍스트 실험기</h3>
+                <p>양손의 좌표를 활용해 가변 직사각형을 생성하고, 입력한 문구를 공간 형태에 맞게 꽉 채워 왜곡하는 AI 실험실.</p>
+            </div>
+            <div class="card-footer" style="color:#00ffaa;">실험실 입장 <span>→</span></div>
+        </div>
     </main>
+
+    <div class="secret-btn-container">
+        <button class="secret-btn" onclick="checkSecretCode()">비밀 게임 접속하기</button>
+    </div>
 
     <div id="projectModal" class="modal">
         <div class="modal-content">
@@ -209,6 +153,18 @@
     </div>
 
     <script src="projectsscript.js"></script>
+
+    <script>
+        function checkSecretCode() {
+            const code = prompt("SYSTEM: 암호를 입력하세요.");
+            
+            if (code === "welove67") {
+                alert("접속 승인! 비밀 구역으로 이동합니다.");
+                window.location.href = "reaction.html";
+            } else if (code !== null) {
+                alert("경고: 잘못된 접근입니다.");
+            }
+        }
+    </script>
 </body>
 </html>
-
