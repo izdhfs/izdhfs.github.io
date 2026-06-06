@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>반응 속도 테스트</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* 드래그 방지 */
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            overflow: hidden;
+        }
+
+        /* 메인 클릭 영역 */
+        #reaction-box {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.1s;
+            padding: 20px;
+        }
+
+        /* 상태별 색상 테마 */
+        .start { background-color: #2b87d1; color: white; }
+        .waiting { background-color: #ce2636; color: white; }
+        .ready { background-color: #4bdb6a; color: white; }
+        .result, .early, .finished { background-color: #2b87d1; color: white; }
+
+        /* 텍스트 스타일 */
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        p {
+            font-size: 1.5rem;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        /* 결과 화면 이미지 스타일 */
+        .result-img {
+            max-width: 250px;
+            height: auto;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+        }
+
+        /* 모바일 대응 */
+        @media (max-width: 600px) {
+            h1 { font-size: 2.5rem; }
+            p { font-size: 1.2rem; }
+            .result-title { font-size: 1.8rem; }
+            .result-img { max-width: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="reaction-box" class="start">
+        <h1 id="message">반응 속도 테스트</h1>
+        <p id="sub-message">화면을 클릭하여 시작하세요 (총 5회)</p>
+    </div>
+
+    <script>
+        const box = document.getElementById('reaction-box');
+        const message = document.getElementById('message');
+        const subMessage = document.getElementById('sub-message');
+
+        let currentState = 'START'; // START, WAITING, READY, EARLY, RESULT, FINISHED
+        let times = [];
+        let timeoutId = null;
+        let startTime = 0;
+        const MAX_ROUNDS = 5;
+
+        function handlePress(e) {
+            if(e.type === 'touchstart') e.preventDefault(); 
+
+            if (currentState === 'START' || currentState === 'RESULT' || currentState === 'EARLY' || currentState === 'FINISHED') {
+                if (currentState === 'FINISHED') {
+                    times = []; 
+                }
+                startWaiting();
+            } else if (currentState === 'WAITING') {
+                clearTimeout(timeoutId);
+                earlyClick();
+            } else if (currentState === 'READY') {
+                recordClick();
+            }
+        }
+
+        box.addEventListener('mousedown', handlePress);
+        box.addEventListener('touchstart', handlePress, { passive: false });
+
+        function startWaiting() {
+            currentState = 'WAITING';
+            box.className = 'waiting';
+            message.innerHTML = "기다리세요...";
+            subMessage.innerHTML = "초록색 화면이 되면 클릭하세요!";
+
+            const randomTime = Math.floor(Math.random() * 3000) + 1500; 
+            
+            timeoutId = setTimeout(() => {
+                currentState = 'READY';
+                box.className = 'ready';
+                message.innerHTML = "클릭!!!";
+                subMessage.innerHTML = "";
+                startTime = Date.now(); 
+            }, randomTime);
+        }
+
+        function earlyClick() {
+            currentState = 'EARLY';
+            box.className = 'early';
+            message.innerHTML = "너무 일찍 눌렀습니다!";
+            subMessage.innerHTML = "화면을 클릭하여 다시 시도하세요.";
+        }
+
+        function recordClick() {
+            const reactionTime = Date.now() - startTime;
+            times.push(reactionTime);
+
+            if (times.length < MAX_ROUNDS) {
+                currentState = 'RESULT';
+                box.className = 'result';
+                message.innerHTML = `${reactionTime} ms`;
+                subMessage.innerHTML = `클릭하여 다음 시도 진행 (${times.length} / ${MAX_ROUNDS})`;
+            } else {
+                currentState = 'FINISHED';
+                box.className = 'finished';
+                
+                const sum = times.reduce((a, b) => a + b, 0);
+                const avg = Math.round(sum / times.length);
+                
+                // 조건에 따른 등급 텍스트 및 이미지 설정
+                let rankMessage = "";
+                let imgSrc = "";
+
+                if (avg <= 50) {
+                    rankMessage = "당신은 핵쟁이입니다";
+                    imgSrc = "u50.jpg";
+                } else if (avg <= 100) {
+                    rankMessage = "뭐야왤케빨라";
+                    imgSrc = "50100.jpg";
+                } else if (avg <= 200) {
+                    rankMessage = "당신은 1등급입니다!(5등급제)";
+                    imgSrc = "100200.jpg";
+                } else if (avg <= 300) {
+                    rankMessage = "당신은 일반인입니다";
+                    imgSrc = "200300.jpg";
+                } else if (avg <= 400) {
+                    rankMessage = "당신은 40대이상이군요ㅋㅋㅋㅋ";
+                    imgSrc = "300400.jpg";
+                } else {
+                    rankMessage = "병원에 가보세요";
+                    imgSrc = "o400.png";
+                }
+
+                // 결과 출력 (제목, 이미지, 평균 속도 순서)
+                message.innerHTML = `
+                    <div class="result-title">${rankMessage}</div>
+                    <img src="${imgSrc}" class="result-img" alt="결과 이미지" onerror="this.style.display='none'">
+                    <div>최종 평균: ${avg} ms</div>
+                `;
+                
+                const history = times.join('ms, ') + 'ms';
+                subMessage.innerHTML = `기록: ${history} <br><br>클릭하여 처음부터 다시 시작하기`;
+            }
+        }
+    </script>
+</body>
+</html>
