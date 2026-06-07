@@ -10,6 +10,7 @@ let activeCamera = null;
 let activeAudioStream = null;
 let activeAudioContext = null;
 let threeRenderer = null; 
+let activeTimeoutId = null; 
 
 function initStars() {
     starField.innerHTML = '';
@@ -88,6 +89,35 @@ const modalData = {
         isInteractive: true,
         labType: 'dynamic_text',
         guide: `<span style="color:#00ffaa; font-weight:bold; font-size:1.05rem;">[Lab 05 이용 방법]</span><br><br>• <span style="color:#fff; font-weight:bold;">텍스트 직접 입력</span>: 우측 상단의 입력창을 통해 짧은 문구와 긴 문구를 자유롭게 설정하세요.<br>• <span style="color:#fff; font-weight:bold;">공간 드로잉</span>: 양손의 엄지 끝과 검지 끝 좌표를 인식시켜 실시간으로 변하는 가상의 직사각형을 만듭니다.<br>• <span style="color:#00ffaa; font-weight:bold;">가로폭 텍스트 스위칭</span>:<br>&nbsp;&nbsp;- 사각형 가로폭 <span style="color:#38bdf8; font-weight:bold;">280px 미만</span>: '짧은 문구' 표출<br>&nbsp;&nbsp;- 사각형 가로폭 <span style="color:#00ffff; font-weight:bold;">280px 이상</span>: '긴 문구' 표출<br>• <span style="color:#ffaa00; font-weight:bold;">도형 맞춤 텍스트 스케일링</span>: 직사각형의 가로/세로 비율에 맞게 텍스트가 찌그러지거나 늘어나며 공간을 100% 빈틈없이 채웁니다.`
+    },
+    'interactive_reaction': {
+        title: 'Lab 06. 인간 신경계 반사 반응 속도 측정기',
+        content: '시각적 자극(색상 변화)을 인지하고 근육을 움직여 화면을 클릭하기까지의 신경 전달 속도를 정밀하게 측정하고 분석합니다.',
+        isInteractive: true,
+        labType: 'reaction',
+        guide: `<span style="color:#ffd700; font-weight:bold; font-size:1.05rem;">[Lab 06 이용 방법]</span><br><br>• 화면을 클릭하여 테스트를 시작합니다.<br>• 화면이 <span style="color:#ce2636; font-weight:bold;">빨간색</span>일 때는 대기합니다.<br>• 화면이 <span style="color:#4bdb6a; font-weight:bold;">초록색</span>으로 변하는 즉시 화면을 클릭하세요!<br>• 총 5번의 테스트를 진행하면 평균 반응 속도와 등급(이미지)이 결과로 표시됩니다.`
+    },
+    'interactive_qrcode': {
+        title: 'Lab 07. 디지털 데이터 인코딩 (QR Code Generator)',
+        content: '입력된 문자열(URL, 텍스트 등)을 즉시 2차원 매트릭스 형태의 바코드(QR 코드) 구조로 변환하는 디지털 실험 장치입니다.',
+        isInteractive: true,
+        labType: 'qrcode',
+        guide: `<span style="color:#a855f7; font-weight:bold; font-size:1.05rem;">[Lab 07 이용 방법]</span><br><br>• 화면 중앙의 입력창에 변환하고자 하는 웹 주소(URL)나 텍스트를 입력하세요.<br>• <span style="color:#a855f7; font-weight:bold;">GENERATE DATA</span> 버튼을 누르면 실시간으로 QR 코드가 렌더링됩니다.<br>• 생성된 QR 코드는 스마트폰 카메라나 리더기 앱을 통해 스캔할 수 있습니다.`
+    },
+    'interactive_music_grid': {
+        title: 'Lab 08. 취향 저격 3x3 앨범 커버 제너레이터',
+        content: '9장의 앨범 커버 이미지를 업로드하여 나만의 음악 취향을 나타내는 3x3 배열 프로필 사진을 렌더링하고 합성하는 유틸리티입니다.',
+        isInteractive: true,
+        labType: 'music_grid',
+        guide: `<span style="color:#ff7f50; font-weight:bold; font-size:1.05rem;">[Lab 08 이용 방법]</span><br><br>• <span style="color:#fff; font-weight:bold;">이미지 업로드</span>: '파일 선택' 버튼을 눌러 좋아하는 앨범 커버 이미지 9장을 한 번에 선택하세요.<br>• <span style="color:#fff; font-weight:bold;">테두리 설정</span>: 격자 사이의 배경(테두리)을 흰색, 검은색, 또는 투명(없음) 중 하나로 선택하세요.<br>• <span style="color:#fff; font-weight:bold;">이미지 다운로드</span>: 완성된 3x3 그리드를 클릭 한 번으로 기기에 저장할 수 있습니다.`
+    },
+    // 🔥 Lab 09 데이터 추가
+    'interactive_blockblast': {
+        title: 'Lab 09. 디지털 매트릭스 네온 블록 블라스트',
+        content: '8x8 매트릭스 공간에 랜덤하게 생성되는 데이터 조각을 드래그하여 빈틈없이 배치하고 라인을 소거하는 공간 지각 논리 게임입니다.',
+        isInteractive: true,
+        labType: 'blockblast',
+        guide: `<span style="color:#ff00ff; font-weight:bold; font-size:1.05rem;">[Lab 09 이용 방법]</span><br><br>• <span style="color:#fff; font-weight:bold;">블록 드래그</span>: 하단에 생성된 3개의 블록 중 하나를 마우스나 터치로 드래그하여 위쪽 8x8 그리드의 빈 공간에 놓습니다.<br>• <span style="color:#fff; font-weight:bold;">라인 클리어</span>: 가로 또는 세로 8칸을 모두 채우면 해당 라인이 폭발하며 점수를 획득합니다.<br>• <span style="color:#ff0055; font-weight:bold;">게임 오버</span>: 남은 블록을 더 이상 그리드에 배치할 공간이 없으면 시스템이 종료됩니다.`
     }
 };
 
@@ -122,6 +152,7 @@ function closeModal() {
     document.getElementById('projectModal').style.display = 'none';
     document.body.style.overflow = 'auto';
     if (activeAnimationId) { cancelAnimationFrame(activeAnimationId); activeAnimationId = null; }
+    if (activeTimeoutId) { clearTimeout(activeTimeoutId); activeTimeoutId = null; }
     if (activeCamera) {
         const video = document.getElementById('labWebcam');
         if (video && video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); }
@@ -163,7 +194,6 @@ function startLab(type) {
     const container = document.getElementById('canvasContainer');
     const spec = Object.values(modalData).find(m => m.labType === type);
     
-    // 🌌 [Lab 01] 은하수 시뮬레이터
     if (type === 'galaxy') {
         container.innerHTML = `
             <div id="loadingText" style="position:absolute; color:#ff0055; font-family:sans-serif; font-size:0.9rem; font-weight:bold; z-index:10;">CALIBRATING NEURAL GESTURE...</div>
@@ -211,7 +241,7 @@ function startLab(type) {
 
         function drawFrame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'rgba(2, 2, 5, 0.2)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(2, 2, 5, 0.88)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
             if (isExploding && Date.now() - explosionStartTime > 1200) { isExploding = false; particles.forEach(p => p.color = p.baseColor); }
             
             if (isHandFound && isFist && !isExploding) { currentCharge = Math.min(100, currentCharge + 1.6); } 
@@ -275,7 +305,6 @@ function startLab(type) {
         activeCamera.start(); drawFrame();
     }
     
-    // 🎵 [Lab 02] 음성 시각화
     else if (type === 'voice') {
         container.innerHTML = `
             <div id="audioLoading" style="position:absolute; color:#00d2ff; font-family:sans-serif; font-size:0.9rem; font-weight:bold; z-index:10;">OPENING SOUND FREQUENCY INTERFACE...</div>
@@ -361,7 +390,6 @@ function startLab(type) {
         }).catch(err => console.log(err));
     }
     
-    // ⏳ [Lab 03] 모래성 시뮬레이터
     else if (type === 'sand') {
         container.innerHTML = `
             <div id="loadingText" style="position:absolute; color:#00ffaa; font-family:sans-serif; font-size:0.9rem; font-weight:bold; z-index:10;">ENGAGING AURORA GRAVITY ENGINE...</div>
@@ -449,7 +477,6 @@ function startLab(type) {
         activeCamera.start(); updateSand();
     }
 
-    // 🤖 [Lab 04] JARVIS 가상 홀로그램 입체 연성소
     else if (type === 'three3d') {
         container.innerHTML = `
             <div id="loadingText" style="position:absolute; color:#00d2ff; font-family:sans-serif; font-size:0.9rem; font-weight:bold; z-index:10; pointer-events:none; text-shadow:0 0 10px #00d2ff;">JARVIS NEURAL CORE ONLINE...</div>
@@ -693,7 +720,6 @@ function startLab(type) {
         activeCamera.start(); loopJARVIS();
     }
 
-    // ✋ [Lab 05] 사용자 입력 동적 텍스트 공간 (Vector Stretch 방식)
     else if (type === 'dynamic_text') {
         container.innerHTML = `
             <div id="loadingText" style="position:absolute; color:#00ffaa; font-family:sans-serif; font-size:0.9rem; font-weight:bold; z-index:10; text-shadow:0 0 10px #00ffaa;">INITIALIZING DYNAMIC TEXT SPACE...</div>
@@ -703,7 +729,7 @@ function startLab(type) {
                 <input type="text" id="longTextInput" value="가로로 길게 늘어나는 긴 문구" placeholder="긴 문구 (280px 이상)" style="background:rgba(6,12,28,0.85); border:1px solid rgba(0,210,255,0.4); color:#fff; padding:10px 15px; border-radius:8px; font-weight:bold; outline:none; width:260px; font-family:sans-serif;">
             </div>
 
-            <video id="labWebcam" autoplay playsinline style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:1 !important; transform: scaleX(-1); z-index:2; pointer-events:none;"></video>
+            <video id="labWebcam" autoplay playsinline style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.6 !important; transform: scaleX(-1); z-index:2; pointer-events:none;"></video>
             <canvas id="dynamicTextCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:5; background:transparent;"></canvas>
         `;
         injectHelpButton(container, spec.guide);
@@ -721,7 +747,7 @@ function startLab(type) {
 
         function drawFrame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'rgba(2, 2, 5, 0.5)'; 
+            ctx.fillStyle = 'rgba(2, 2, 5, 0.25)'; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             if (currentPoints.length === 4) {
@@ -733,25 +759,19 @@ function startLab(type) {
                 const rectWidth = Math.max(1, maxX - minX);
                 const rectHeight = Math.max(1, maxY - minY);
 
-                // 직사각형 가이드 박스 렌더링
                 ctx.strokeStyle = '#00ffaa';
                 ctx.lineWidth = 3;
                 ctx.strokeRect(minX, minY, rectWidth, rectHeight);
                 ctx.fillStyle = 'rgba(0, 255, 170, 0.05)';
                 ctx.fillRect(minX, minY, rectWidth, rectHeight);
 
-                // 가로폭 280px 기준 텍스트 분기
                 let text = rectWidth < 280 ? (shortInput.value || "SHORT") : (longInput.value || "LONG TEXT");
                 
-                // Vector Stretch 방식의 텍스트 렌더링 (공간에 100% 꽉 차도록 비율 왜곡)
                 ctx.save();
-                
-                // 1. 기준점이 될 직사각형의 한가운데로 이동
                 const centerX = minX + rectWidth / 2;
                 const centerY = minY + rectHeight / 2;
                 ctx.translate(centerX, centerY);
                 
-                // 2. 가상의 아주 큰 폰트 사이즈 기준으로 텍스트 측정
                 const baseFontSize = 100;
                 ctx.font = `900 ${baseFontSize}px sans-serif`;
                 ctx.textAlign = 'center';
@@ -759,22 +779,18 @@ function startLab(type) {
                 
                 const metrics = ctx.measureText(text);
                 const textWidth = metrics.width || 1;
-                // 브라우저에 따라 actualBoundingBox 값을 지원하지 않을 수 있으므로 Fallback 로직 추가
                 const actualHeight = (metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent);
                 const textHeight = actualHeight && actualHeight > 0 ? actualHeight : (baseFontSize * 0.8);
                 
-                // 3. 직사각형의 가로/세로 길이에 맞추어 x축과 y축의 확대/축소(스케일) 비율을 개별 계산
                 const scaleX = rectWidth / textWidth;
                 const scaleY = rectHeight / textHeight;
                 
-                // 4. 컨텍스트 자체를 왜곡하여 글씨를 렌더링
                 ctx.scale(scaleX, scaleY);
                 ctx.fillStyle = '#ffffff';
                 ctx.fillText(text, 0, 0); 
                 
                 ctx.restore();
 
-                // 양손 4개 좌표 시각화 포인트 렌더링
                 currentPoints.forEach(p => {
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
@@ -810,13 +826,619 @@ function startLab(type) {
                     points.push({ x: iX, y: iY });
                 }
             }
-
             currentPoints = points;
         });
 
         activeCamera = new Camera(video, { onFrame: async () => { await hands.send({ image: video }); }, width: 640, height: 480 });
         activeCamera.start();
         drawFrame();
+    }
+
+    else if (type === 'reaction') {
+        container.innerHTML = `
+            <div id="reaction-box" style="width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; text-align:center; transition:background-color 0.1s; background-color:#2b87d1; color:white; border-radius:15px; position:absolute; top:0; left:0; z-index:5;">
+                <h1 id="reaction-message" style="font-size:3.5rem; margin-bottom:1rem; font-weight:800; text-shadow:0 2px 10px rgba(0,0,0,0.2);">반응 속도 테스트</h1>
+                <p id="reaction-sub-message" style="font-size:1.3rem; opacity:0.9; font-weight:500;">화면을 클릭하여 시작하세요 (총 5회)</p>
+            </div>
+        `;
+        injectHelpButton(container, spec.guide);
+
+        const box = document.getElementById('reaction-box');
+        const message = document.getElementById('reaction-message');
+        const subMessage = document.getElementById('reaction-sub-message');
+
+        let currentState = 'START';
+        let times = [];
+        let startTime = 0;
+        const MAX_ROUNDS = 5;
+
+        function setBoxState(bgColor, msg, sub) {
+            box.style.backgroundColor = bgColor;
+            message.innerHTML = msg;
+            subMessage.innerHTML = sub;
+        }
+
+        function handlePress(e) {
+            if(e.type === 'touchstart') e.preventDefault(); 
+
+            if (currentState === 'START' || currentState === 'RESULT' || currentState === 'EARLY' || currentState === 'FINISHED') {
+                if (currentState === 'FINISHED') times = []; 
+                startWaiting();
+            } else if (currentState === 'WAITING') {
+                clearTimeout(activeTimeoutId);
+                earlyClick();
+            } else if (currentState === 'READY') {
+                recordClick();
+            }
+        }
+
+        box.addEventListener('mousedown', handlePress);
+        box.addEventListener('touchstart', handlePress, { passive: false });
+
+        function startWaiting() {
+            currentState = 'WAITING';
+            setBoxState('#ce2636', "기다리세요...", "초록색 화면이 되면 클릭하세요!");
+
+            const randomTime = Math.floor(Math.random() * 3000) + 1500; 
+            
+            activeTimeoutId = setTimeout(() => {
+                if(!document.getElementById('reaction-box')) return; 
+                currentState = 'READY';
+                setBoxState('#4bdb6a', "클릭!!!", "");
+                startTime = Date.now(); 
+            }, randomTime);
+        }
+
+        function earlyClick() {
+            currentState = 'EARLY';
+            setBoxState('#2b87d1', "너무 일찍 눌렀습니다!", "화면을 클릭하여 다시 시도하세요.");
+        }
+
+        function recordClick() {
+            const reactionTime = Date.now() - startTime;
+            times.push(reactionTime);
+
+            if (times.length < MAX_ROUNDS) {
+                currentState = 'RESULT';
+                setBoxState('#2b87d1', `${reactionTime} ms`, `클릭하여 다음 시도 진행 (${times.length} / ${MAX_ROUNDS})`);
+            } else {
+                currentState = 'FINISHED';
+                const sum = times.reduce((a, b) => a + b, 0);
+                const avg = Math.round(sum / times.length);
+                
+                let rankMessage = "";
+                let imgSrc = "";
+
+                if (avg <= 50) { rankMessage = "당신은 핵쟁이입니다"; imgSrc = "u50.png"; }
+                else if (avg <= 100) { rankMessage = "뭐야왤케빨라"; imgSrc = "50100.png"; }
+                else if (avg <= 200) { rankMessage = "당신은 1등급입니다!(5등급제)"; imgSrc = "100200.png"; }
+                else if (avg <= 300) { rankMessage = "당신은 일반인입니다"; imgSrc = "200300.png"; }
+                else if (avg <= 400) { rankMessage = "당신은 40대이상이군요ㅋㅋㅋㅋ"; imgSrc = "300400.png"; }
+                else { rankMessage = "병원에 가보세요"; imgSrc = "o400.png"; }
+
+                box.style.backgroundColor = '#2b87d1';
+                message.innerHTML = `
+                    <div style="font-size: 2.2rem; font-weight: 900; color: #ffd700; text-shadow: 0 2px 10px rgba(0,0,0,0.3); margin-bottom: 15px;">${rankMessage}</div>
+                    <img src="${imgSrc}" alt="결과 이미지" onerror="this.style.display='none'" style="max-width: 200px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); margin-bottom:15px;">
+                    <div>최종 평균: ${avg} ms</div>
+                `;
+                const history = times.join('ms, ') + 'ms';
+                subMessage.innerHTML = `기록: ${history} <br><br>클릭하여 처음부터 다시 시작하기`;
+            }
+        }
+    }
+    
+    else if (type === 'qrcode') {
+        container.innerHTML = `
+            <div style="position:relative; width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#05050a; z-index:5; border-radius:15px;">
+                <h2 style="color:#a855f7; margin-bottom:25px; font-size:2.2rem; font-weight:900; text-shadow:0 0 15px rgba(168, 85, 247, 0.6); letter-spacing:2px;">QR DATA ENCODER</h2>
+                
+                <input type="text" id="qrInput" placeholder="URL이나 변환할 텍스트를 입력하세요" 
+                    style="width:80%; max-width:500px; padding:18px 20px; border-radius:12px; border:2px solid rgba(168, 85, 247, 0.5); background:rgba(20, 10, 35, 0.8); color:#fff; font-size:1.1rem; outline:none; text-align:center; margin-bottom:25px; box-shadow:inset 0 0 10px rgba(168, 85, 247, 0.2); transition:0.3s;">
+                
+                <button id="generateBtn" 
+                    style="padding:15px 40px; background:linear-gradient(90deg, #9333ea, #c084fc); color:#fff; font-weight:bold; border:none; border-radius:30px; cursor:pointer; font-size:1.1rem; letter-spacing:1px; box-shadow:0 0 20px rgba(168, 85, 247, 0.5); transition:transform 0.2s, box-shadow 0.2s;">
+                    GENERATE DATA
+                </button>
+                
+                <div id="qrDisplay" style="margin-top:40px; padding:20px; background:#fff; border-radius:16px; display:none; box-shadow:0 0 30px rgba(255,255,255,0.15); animation: fadeIn 0.4s ease-out;">
+                    <img id="qrImage" src="" alt="QR Code" style="display:block; width:220px; height:220px;">
+                </div>
+            </div>
+        `;
+        injectHelpButton(container, spec.guide);
+
+        const input = document.getElementById('qrInput');
+        const btn = document.getElementById('generateBtn');
+        const display = document.getElementById('qrDisplay');
+        const img = document.getElementById('qrImage');
+
+        input.addEventListener('focus', () => {
+            input.style.border = "2px solid #a855f7";
+            input.style.boxShadow = "0 0 15px rgba(168, 85, 247, 0.5)";
+        });
+        input.addEventListener('blur', () => {
+            input.style.border = "2px solid rgba(168, 85, 247, 0.5)";
+            input.style.boxShadow = "inset 0 0 10px rgba(168, 85, 247, 0.2)";
+        });
+
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') btn.click();
+        });
+
+        btn.onclick = () => {
+            const text = input.value.trim();
+            if(!text) {
+                alert("인코딩할 데이터를 입력해주세요.");
+                return;
+            }
+            
+            btn.innerText = "ENCODING...";
+            btn.style.transform = "scale(0.95)";
+            
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(text)}&color=000000&bgcolor=ffffff`;
+            
+            img.src = qrApiUrl;
+            
+            img.onload = () => {
+                display.style.display = 'block';
+                btn.innerText = "GENERATE DATA";
+                btn.style.transform = "scale(1)";
+            };
+            
+            img.onerror = () => {
+                alert("QR 코드를 생성하는 데 문제가 발생했습니다.");
+                btn.innerText = "GENERATE DATA";
+                btn.style.transform = "scale(1)";
+            };
+        };
+    }
+
+    else if (type === 'music_grid') {
+        container.innerHTML = `
+            <div style="position:relative; width:100%; height:100%; display:flex; flex-direction:row; align-items:center; justify-content:center; background:#05050a; z-index:5; border-radius:15px; padding: 30px; gap: 40px; flex-wrap:wrap;">
+                <div style="flex: 1; min-width: 300px; display:flex; justify-content:center; align-items:center; background:rgba(0,0,0,0.5); border-radius: 16px; height: 100%; padding: 20px;">
+                    <canvas id="gridCanvas" width="600" height="600" style="max-width:100%; max-height:100%; object-fit:contain; box-shadow: 0 0 25px rgba(255, 127, 80, 0.2); border-radius:8px;"></canvas>
+                </div>
+                <div style="width: 320px; display:flex; flex-direction:column; gap: 25px; background:rgba(20,20,30,0.8); padding: 30px; border-radius:16px; border:1px solid rgba(255,127,80,0.3);">
+                    <h2 style="color:#ff7f50; font-weight:900; font-size:1.6rem; text-align:center; letter-spacing:1px; margin-bottom:5px;">ALBUM GRID</h2>
+                    <div>
+                        <label style="color:#fff; font-size:0.95rem; font-weight:bold; margin-bottom:10px; display:block;">1. 이미지 업로드 (9장 선택)</label>
+                        <input type="file" id="imageUpload" multiple accept="image/*" style="width:100%; color:#fff; background:rgba(255,127,80,0.1); border:1px solid #ff7f50; padding:12px; border-radius:8px; cursor:pointer;">
+                        <small style="color:#a0a0b0; font-size:0.8rem; display:block; margin-top:8px; text-align:center;" id="uploadStatus">업로드 대기 중...</small>
+                    </div>
+                    <div>
+                        <label style="color:#fff; font-size:0.95rem; font-weight:bold; margin-bottom:10px; display:block;">2. 테두리 스타일 선택</label>
+                        <select id="borderStyle" style="width:100%; padding:12px; border-radius:8px; background:#111; color:#fff; border:1px solid #ff7f50; outline:none; font-size:1rem; cursor:pointer;">
+                            <option value="none">없음 (투명/꽉참)</option>
+                            <option value="white">흰색 테두리</option>
+                            <option value="black">검은색 테두리</option>
+                        </select>
+                    </div>
+                    <button id="downloadBtn" style="margin-top:15px; padding:16px; background:linear-gradient(90deg, #ff7f50, #ff4500); color:#fff; font-weight:bold; border:none; border-radius:8px; cursor:pointer; font-size:1.1rem; box-shadow:0 0 15px rgba(255, 127, 80, 0.4); transition:0.2s;">
+                        💾 이미지 다운로드
+                    </button>
+                </div>
+            </div>
+        `;
+        injectHelpButton(container, spec.guide);
+
+        const canvas = document.getElementById('gridCanvas');
+        const ctx = canvas.getContext('2d');
+        const imageUpload = document.getElementById('imageUpload');
+        const borderStyle = document.getElementById('borderStyle');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const uploadStatus = document.getElementById('uploadStatus');
+
+        let loadedImages = new Array(9).fill(null);
+
+        function drawGrid() {
+            const borderType = borderStyle.value;
+            const padding = borderType === 'none' ? 0 : 30; 
+            const gap = borderType === 'none' ? 0 : 15;     
+            const cellSize = 300;                           
+            
+            const canvasSize = (cellSize * 3) + (gap * 2) + (padding * 2);
+            canvas.width = canvasSize;
+            canvas.height = canvasSize;
+
+            if (borderType === 'white') {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvasSize, canvasSize);
+            } else if (borderType === 'black') {
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(0, 0, canvasSize, canvasSize);
+            } else {
+                ctx.clearRect(0, 0, canvasSize, canvasSize);
+            }
+
+            for (let i = 0; i < 9; i++) {
+                const row = Math.floor(i / 3);
+                const col = i % 3;
+                const x = padding + (col * (cellSize + gap));
+                const y = padding + (row * (cellSize + gap));
+
+                if (loadedImages[i]) {
+                    const img = loadedImages[i];
+                    const scale = Math.max(cellSize / img.width, cellSize / img.height);
+                    const w = img.width * scale;
+                    const h = img.height * scale;
+                    const dx = x + (cellSize - w) / 2;
+                    const dy = y + (cellSize - h) / 2;
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(x, y, cellSize, cellSize);
+                    ctx.clip();
+                    ctx.drawImage(img, dx, dy, w, h);
+                    ctx.restore();
+                } else {
+                    ctx.fillStyle = borderType === 'none' ? 'rgba(255,255,255,0.05)' : (borderType === 'white' ? '#f0f0f0' : '#1a1a1a');
+                    ctx.fillRect(x, y, cellSize, cellSize);
+                    
+                    ctx.fillStyle = borderType === 'none' ? '#555' : (borderType === 'white' ? '#ccc' : '#444');
+                    ctx.font = 'bold 36px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(`+ ${i + 1}`, x + cellSize / 2, y + cellSize / 2);
+                }
+            }
+        }
+
+        borderStyle.addEventListener('change', drawGrid);
+
+        imageUpload.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files).slice(0, 9); 
+            if (files.length === 0) return;
+
+            loadedImages = new Array(9).fill(null);
+            uploadStatus.style.color = '#ffaa00';
+            uploadStatus.innerText = `업로드 진행 중... (0/${files.length})`;
+
+            let loadedCount = 0;
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        loadedImages[index] = img;
+                        loadedCount++;
+                        uploadStatus.innerText = `업로드 진행 중... (${loadedCount}/${files.length})`;
+                        
+                        drawGrid();
+
+                        if (loadedCount === files.length) {
+                            uploadStatus.style.color = '#00ffaa';
+                            uploadStatus.innerText = `완료! 총 ${loadedCount}장 적용됨`;
+                        }
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'my_music_profile.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+
+        drawGrid();
+    }
+
+    // 🔥 [Lab 09] 네온 블록 블라스트 (Neon Block Blast)
+    else if (type === 'blockblast') {
+        container.innerHTML = `
+            <div style="position:relative; width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#05050a; z-index:5; border-radius:15px; user-select:none;">
+                <div style="position:absolute; top:20px; left:30px; color:#ff00ff; font-weight:bold; font-size:1.5rem; text-shadow:0 0 10px rgba(255,0,255,0.5);">SCORE: <span id="bbScore" style="color:#fff;">0</span></div>
+                <button id="bbResetBtn" style="position:absolute; top:20px; right:30px; background:rgba(255,0,255,0.2); border:1px solid #ff00ff; color:#fff; padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:bold; outline:none;">RESTART</button>
+                
+                <canvas id="bbCanvas" style="background:transparent;"></canvas>
+            </div>
+        `;
+        injectHelpButton(container, spec.guide);
+
+        const canvas = document.getElementById('bbCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreUI = document.getElementById('bbScore');
+        const resetBtn = document.getElementById('bbResetBtn');
+
+        // 게임 설정값
+        const cols = 8;
+        const rows = 8;
+        const cellSize = 40;
+        const gridOffsetX = (container.clientWidth - (cols * cellSize)) / 2;
+        const gridOffsetY = 80; // 상단 여백
+        
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+
+        let board = Array(rows).fill().map(() => Array(cols).fill(0));
+        let score = 0;
+        let particles = [];
+        let trayShapes = [];
+        let draggingShape = null;
+
+        const neonColors = ['#00d2ff', '#00ffaa', '#ff0055', '#ffaa00', '#a855f7', '#ff00ff'];
+        const shapeTemplates = [
+            [[1]], 
+            [[1,1]], [[1],[1]],
+            [[1,1,1]], [[1],[1],[1]],
+            [[1,1],[1,1]], 
+            [[1,1,1],[1,1,1],[1,1,1]],
+            [[1,1,1],[1,0,0],[1,0,0]], [[1,1,1],[0,0,1],[0,0,1]],
+            [[1,0],[1,1]], [[0,1],[1,1]]
+        ];
+
+        function createRandomShape(trayIndex) {
+            const matrix = shapeTemplates[Math.floor(Math.random() * shapeTemplates.length)];
+            const color = neonColors[Math.floor(Math.random() * neonColors.length)];
+            // 트레이 위치 계산 (하단 3분할)
+            const trayW = canvas.width / 3;
+            const blockW = matrix[0].length * cellSize;
+            const blockH = matrix.length * cellSize;
+            const x = (trayIndex * trayW) + (trayW - blockW) / 2;
+            const y = canvas.height - 180 + (120 - blockH) / 2; // 하단 여백 중앙
+
+            return { matrix, color, originX: x, originY: y, x, y, isDragging: false, trayIndex };
+        }
+
+        function refillTray() {
+            trayShapes = [];
+            for(let i = 0; i < 3; i++) {
+                trayShapes.push(createRandomShape(i));
+            }
+        }
+
+        function drawBoard() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 보드 배경 그리기
+            ctx.fillStyle = 'rgba(20, 20, 30, 0.6)';
+            ctx.fillRect(gridOffsetX, gridOffsetY, cols * cellSize, rows * cellSize);
+            ctx.strokeStyle = 'rgba(255, 0, 255, 0.3)';
+            ctx.lineWidth = 1;
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const x = gridOffsetX + c * cellSize;
+                    const y = gridOffsetY + r * cellSize;
+                    
+                    ctx.strokeRect(x, y, cellSize, cellSize);
+
+                    if (board[r][c]) {
+                        ctx.fillStyle = board[r][c];
+                        ctx.shadowBlur = 10;
+                        ctx.shadowColor = board[r][c];
+                        ctx.fillRect(x + 2, y + 2, cellSize - 4, cellSize - 4);
+                        ctx.shadowBlur = 0;
+                    }
+                }
+            }
+        }
+
+        function drawShape(shape) {
+            ctx.fillStyle = shape.color;
+            ctx.shadowBlur = shape.isDragging ? 15 : 5;
+            ctx.shadowColor = shape.color;
+
+            for (let r = 0; r < shape.matrix.length; r++) {
+                for (let c = 0; c < shape.matrix[r].length; c++) {
+                    if (shape.matrix[r][c]) {
+                        // 드래그 중일 때는 살짝 위로 떠보이게 크기 조절
+                        const scale = shape.isDragging ? 1.0 : 0.7; 
+                        const visualSize = cellSize * scale;
+                        const x = shape.x + (c * cellSize);
+                        const y = shape.y + (r * cellSize);
+                        
+                        ctx.fillRect(x + (cellSize - visualSize)/2, y + (cellSize - visualSize)/2, visualSize - 2, visualSize - 2);
+                    }
+                }
+            }
+            ctx.shadowBlur = 0;
+        }
+
+        function drawParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 0.05;
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                } else {
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = p.life;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1.0;
+                }
+            }
+        }
+
+        function render() {
+            drawBoard();
+            trayShapes.forEach(shape => drawShape(shape));
+            if (draggingShape) drawShape(draggingShape);
+            drawParticles();
+            activeAnimationId = requestAnimationFrame(render);
+        }
+
+        function getEventPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+
+        function isPointInShape(x, y, shape) {
+            const blockW = shape.matrix[0].length * cellSize;
+            const blockH = shape.matrix.length * cellSize;
+            return x >= shape.x && x <= shape.x + blockW && y >= shape.y && y <= shape.y + blockH;
+        }
+
+        function checkLineClears() {
+            let linesToClearRows = [];
+            let linesToClearCols = [];
+
+            // 행 확인
+            for (let r = 0; r < rows; r++) {
+                if (board[r].every(cell => cell !== 0)) linesToClearRows.push(r);
+            }
+            // 열 확인
+            for (let c = 0; c < cols; c++) {
+                let full = true;
+                for (let r = 0; r < rows; r++) {
+                    if (board[r][c] === 0) { full = false; break; }
+                }
+                if (full) linesToClearCols.push(c);
+            }
+
+            let clearedCells = 0;
+
+            linesToClearRows.forEach(r => {
+                for (let c = 0; c < cols; c++) {
+                    if(board[r][c] !== 0) {
+                        createExplosion(gridOffsetX + c * cellSize + cellSize/2, gridOffsetY + r * cellSize + cellSize/2, board[r][c]);
+                        board[r][c] = 0;
+                        clearedCells++;
+                    }
+                }
+            });
+
+            linesToClearCols.forEach(c => {
+                for (let r = 0; r < rows; r++) {
+                    if(board[r][c] !== 0) {
+                        createExplosion(gridOffsetX + c * cellSize + cellSize/2, gridOffsetY + r * cellSize + cellSize/2, board[r][c]);
+                        board[r][c] = 0;
+                        clearedCells++;
+                    }
+                }
+            });
+
+            if (clearedCells > 0) {
+                score += clearedCells * 10;
+                scoreUI.innerText = score;
+            }
+        }
+
+        function createExplosion(x, y, color) {
+            for(let i=0; i<10; i++) {
+                particles.push({
+                    x, y,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8,
+                    size: Math.random() * 4 + 2,
+                    color: color,
+                    life: 1.0
+                });
+            }
+        }
+
+        // 마우스 및 터치 이벤트 연결
+        function handleStart(e) {
+            if(e.type === 'touchstart') e.preventDefault();
+            const pos = getEventPos(e);
+            
+            // 트레이 역순 검색 (위에 렌더링된 것부터 잡기 위해)
+            for (let i = trayShapes.length - 1; i >= 0; i--) {
+                if (isPointInShape(pos.x, pos.y, trayShapes[i])) {
+                    draggingShape = trayShapes.splice(i, 1)[0];
+                    draggingShape.isDragging = true;
+                    // 클릭 지점과 도형 원점의 오프셋 저장
+                    draggingShape.offsetX = pos.x - draggingShape.x;
+                    draggingShape.offsetY = pos.y - draggingShape.y;
+                    break;
+                }
+            }
+        }
+
+        function handleMove(e) {
+            if (!draggingShape) return;
+            if(e.type === 'touchmove') e.preventDefault();
+            const pos = getEventPos(e);
+            
+            // 모바일 화면 등에서 손가락에 가려지지 않도록 터치 시 Y축을 살짝 위로 올림
+            const yOffsetBoost = e.type === 'touchmove' ? 60 : 0;
+            
+            draggingShape.x = pos.x - draggingShape.offsetX;
+            draggingShape.y = pos.y - draggingShape.offsetY - yOffsetBoost;
+        }
+
+        function handleEnd(e) {
+            if (!draggingShape) return;
+            
+            // 현재 드래그 중인 블록이 그리드 칸에 맞는지 확인
+            const snapC = Math.round((draggingShape.x - gridOffsetX) / cellSize);
+            const snapR = Math.round((draggingShape.y - gridOffsetY) / cellSize);
+            
+            let canPlace = true;
+            for (let r = 0; r < draggingShape.matrix.length; r++) {
+                for (let c = 0; c < draggingShape.matrix[r].length; c++) {
+                    if (draggingShape.matrix[r][c]) {
+                        const boardR = snapR + r;
+                        const boardC = snapC + c;
+                        if (boardR < 0 || boardR >= rows || boardC < 0 || boardC >= cols || board[boardR][boardC] !== 0) {
+                            canPlace = false;
+                            break;
+                        }
+                    }
+                }
+                if (!canPlace) break;
+            }
+
+            if (canPlace) {
+                // 그리드에 블록 배치
+                for (let r = 0; r < draggingShape.matrix.length; r++) {
+                    for (let c = 0; c < draggingShape.matrix[r].length; c++) {
+                        if (draggingShape.matrix[r][c]) {
+                            board[snapR + r][snapC + c] = draggingShape.color;
+                        }
+                    }
+                }
+                score += 5; // 배치 점수
+                scoreUI.innerText = score;
+                checkLineClears();
+                
+                draggingShape = null;
+                
+                // 트레이가 비었으면 새로 채움
+                if (trayShapes.length === 0) refillTray();
+                
+            } else {
+                // 실패 시 원래 자리로 되돌림
+                draggingShape.isDragging = false;
+                draggingShape.x = draggingShape.originX;
+                draggingShape.y = draggingShape.originY;
+                trayShapes.splice(draggingShape.trayIndex, 0, draggingShape);
+                draggingShape = null;
+            }
+        }
+
+        canvas.addEventListener('mousedown', handleStart);
+        canvas.addEventListener('mousemove', handleMove);
+        window.addEventListener('mouseup', handleEnd); // 창 밖에서 놓아도 풀리도록
+        canvas.addEventListener('touchstart', handleStart, { passive: false });
+        canvas.addEventListener('touchmove', handleMove, { passive: false });
+        window.addEventListener('touchend', handleEnd);
+
+        resetBtn.addEventListener('click', () => {
+            board = Array(rows).fill().map(() => Array(cols).fill(0));
+            score = 0;
+            scoreUI.innerText = score;
+            refillTray();
+        });
+
+        // 게임 초기화 및 시작
+        refillTray();
+        render();
     }
 }
 
