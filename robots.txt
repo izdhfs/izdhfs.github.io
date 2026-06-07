@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://izdhfs.com/sitemap.xml
