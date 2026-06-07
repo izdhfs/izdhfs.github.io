@@ -26,7 +26,7 @@
         .page-title-section h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 10px; background: linear-gradient(135deg, #fff 0%, #888 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .page-title-section p { color: #666; font-size: 1rem; }
 
-        main { position: relative; z-index: 2; max-width: 1400px; margin: 0 auto; padding: 20px 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; min-height: 70vh; }
+        main { position: relative; z-index: 2; max-width: 1400px; margin: 0 auto; padding: 20px 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; min-height: 70vh; margin-bottom: 50px; }
         .card { background: rgba(20, 20, 20, 0.6); border: 1px solid #1a1a1a; border-radius: 12px; padding: 30px; cursor: pointer; transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
         .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(3,70,148,0.1) 0%, transparent 100%); opacity: 0; transition: 0.3s; }
         .card:hover { transform: translateY(-5px); border-color: #034694; box-shadow: 0 10px 30px rgba(3, 70, 148, 0.2); }
@@ -40,7 +40,7 @@
         .card:hover .card-footer span { transform: translateX(5px); }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 100; backdrop-filter: blur(10px); animation: fadeIn 0.25s ease-out; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 900px; height: 85vh; background-color: #0a0a0a; border: 1px solid #222; border-radius: 16px; padding: 40px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 1000px; height: 85vh; background-color: #0a0a0a; border: 1px solid #222; border-radius: 16px; padding: 40px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
         .close-btn { position: absolute; top: 25px; right: 30px; font-size: 2rem; color: #666; cursor: pointer; transition: 0.2s; z-index: 101; }
         .close-btn:hover { color: #fff; }
         .modal-body { width: 100%; flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; color: #ccc; }
@@ -52,27 +52,6 @@
             .header-nav { display: flex !important; width: 100% !important; justify-content: center !important; gap: 15px !important; }
             .header-nav a { font-size: 0.8rem !important; letter-spacing: 0.5px !important; white-space: nowrap !important; opacity: 0.8 !important; }
         }
-
-        /* 🤫 비밀 버튼 스타일 */
-        .secret-btn-container {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            padding: 40px 0 60px 0;
-        }
-        .secret-btn {
-            background: none;
-            border: none;
-            color: #1a1a1a; /* 배경과 비슷하게 어둡게 숨김 */
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: color 0.3s, text-shadow 0.3s;
-        }
-        .secret-btn:hover {
-            color: #00ffaa; /* 마우스 올리면 네온 그린으로 발광 */
-            text-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
-        }
     </style>
 </head>
 <body>
@@ -83,8 +62,8 @@
         <a href="index.html" class="header-logo">IZDHFS</a>
         <nav class="header-nav">
             <a href="index.html">HOME</a>
-            <a href="personal.html">PERSONAL</a>
-            <a href="#academic.html">ACADEMIC</a>
+            <a href="#personal">PERSONAL</a>
+            <a href="#academic">ACADEMIC</a>
             <a href="projects.html" class="active">PROJECTS</a>
         </nav>
     </header>
@@ -95,55 +74,87 @@
     </div>
 
     <main>
-        <div class="card interactive" onclick="openModal('interactive_galaxy')">
+        <div class="card interactive" onclick="openModal('interactive_galaxy')" onmouseover="this.style.borderColor='#ff0055'" onmouseout="this.style.borderColor='#1a1a1a'">
             <div>
-                <div class="card-tag">Interactive Lab 01</div>
+                <div class="card-tag" style="color:#ff0055;">Interactive Lab 01</div>
                 <h3>손가락 중력<br>은하수 시뮬레이터</h3>
                 <p>AI 손끝 추적 기술과 천체 중력 연산 법칙을 융합한 인터랙티브 가상 우주 공간.</p>
             </div>
-            <div class="card-footer" style="color:#38bdf8;">실험실 입장 <span>→</span></div>
+            <div class="card-footer" style="color:#ff0055;">실험실 입장 <span>→</span></div>
         </div>
 
-        <div class="card interactive" onclick="openModal('interactive_voice')">
+        <div class="card interactive" onclick="openModal('interactive_voice')" onmouseover="this.style.borderColor='#00d2ff'" onmouseout="this.style.borderColor='#1a1a1a'">
             <div>
-                <div class="card-tag">Interactive Lab 02</div>
+                <div class="card-tag" style="color:#00d2ff;">Interactive Lab 02</div>
                 <h3>음성 주파수<br>실시간 시각화 분석기</h3>
                 <p>Web Audio API 아날라이저 기반 음성 성질 파동의 수학적 렌더링 디지털 장치.</p>
-            </div>
-            <div class="card-footer" style="color:#38bdf8;">실험실 입장 <span>→</span></div>
-        </div>
-
-        <div class="card interactive" onclick="openModal('interactive_sand')">
-            <div>
-                <div class="card-tag">Interactive Lab 03</div>
-                <h3>물리 역학 디지털<br>모래성 시뮬레이터</h3>
-                <p>내 모습 위에 떨어지는 무거운 모래 알갱이들의 마찰 및 각도 누적 물리 엔진실.</p>
-            </div>
-            <div class="card-footer" style="color:#38bdf8;">실험실 입장 <span>→</span></div>
-        </div>
-
-        <div class="card interactive" onclick="openModal('interactive_3d')">
-            <div>
-                <div class="card-tag">Interactive Lab 04</div>
-                <h3>JARVIS 가상 공간<br>홀로그램 입체 연성소</h3>
-                <p>손가락 수로 도형을 고르고, 양손을 오므린 간격 사이에 단 하나의 3D 입체를 설계하는 미래 기술형 실험실.</p>
             </div>
             <div class="card-footer" style="color:#00d2ff;">실험실 입장 <span>→</span></div>
         </div>
 
-        <div class="card interactive" onclick="openModal('interactive_dynamic_text')">
+        <div class="card interactive" onclick="openModal('interactive_sand')" onmouseover="this.style.borderColor='#00ffaa'" onmouseout="this.style.borderColor='#1a1a1a'">
             <div>
-                <div class="card-tag">Interactive Lab 05</div>
-                <h3>가상 제스처 공간<br>동적 텍스트 실험기</h3>
-                <p>양손의 좌표를 활용해 가변 직사각형을 생성하고, 입력한 문구를 공간 형태에 맞게 꽉 채워 왜곡하는 AI 실험실.</p>
+                <div class="card-tag" style="color:#00ffaa;">Interactive Lab 03</div>
+                <h3>물리 역학 디지털<br>모래성 시뮬레이터</h3>
+                <p>내 모습 위에 떨어지는 무거운 모래 알갱이들의 마찰 및 각도 누적 물리 엔진실.</p>
             </div>
             <div class="card-footer" style="color:#00ffaa;">실험실 입장 <span>→</span></div>
         </div>
-    </main>
 
-    <div class="secret-btn-container">
-        <button class="secret-btn" onclick="checkSecretCode()">비밀 게임 접속하기</button>
-    </div>
+        <div class="card interactive" onclick="openModal('interactive_3d')" onmouseover="this.style.borderColor='#38bdf8'" onmouseout="this.style.borderColor='#1a1a1a'">
+            <div>
+                <div class="card-tag" style="color:#38bdf8;">Interactive Lab 04</div>
+                <h3>JARVIS 가상 공간<br>홀로그램 입체 연성소</h3>
+                <p>손가락 수로 도형을 고르고, 양손을 오므린 간격 사이에 단 하나의 3D 입체를 설계하는 미래 기술형 실험실.</p>
+            </div>
+            <div class="card-footer" style="color:#38bdf8;">실험실 입장 <span>→</span></div>
+        </div>
+
+        <div class="card interactive" onclick="openModal('interactive_dynamic_text')" onmouseover="this.style.borderColor='#ffaa00'" onmouseout="this.style.borderColor='#1a1a1a'">
+            <div>
+                <div class="card-tag" style="color:#ffaa00;">Interactive Lab 05</div>
+                <h3>가상 제스처 공간<br>동적 텍스트 실험기</h3>
+                <p>양손의 좌표를 활용해 가변 직사각형을 생성하고, 입력한 문구를 공간 형태에 맞게 꽉 채워 왜곡하는 AI 실험실.</p>
+            </div>
+            <div class="card-footer" style="color:#ffaa00;">실험실 입장 <span>→</span></div>
+        </div>
+
+        <div class="card interactive" onclick="openModal('interactive_reaction')" onmouseover="this.style.borderColor='#ef4444'" onmouseout="this.style.borderColor='#1a1a1a'">
+            <div>
+                <div class="card-tag" style="color:#ef4444;">Interactive Lab 06</div>
+                <h3>인간 신경계 반사<br>반응 속도 측정기</h3>
+                <p>시각적 자극(색상 변화)을 인지하고 근육을 움직여 마우스를 클릭하기까지의 신경 전달 속도를 정밀 측정하는 시스템.</p>
+            </div>
+            <div class="card-footer" style="color:#ef4444;">실험실 입장 <span>→</span></div>
+        </div>
+
+        <div class="card interactive" onclick="openModal('interactive_qrcode')" onmouseover="this.style.borderColor='#a855f7'" onmouseout="this.style.borderColor='#1a1a1a'">
+            <div>
+                <div class="card-tag" style="color:#a855f7;">Interactive Lab 07</div>
+                <h3>디지털 데이터 인코딩<br>QR Code Generator</h3>
+                <p>텍스트, 링크 등의 문자열 데이터를 2차원 매트릭스 형태의 시각적 패턴(QR 코드)으로 즉각 변환하는 인코딩 실험기.</p>
+            </div>
+            <div class="card-footer" style="color:#a855f7;">실험실 입장 <span>→</span></div>
+        </div>
+
+        <div class="card interactive" onclick="openModal('interactive_music_grid')" onmouseover="this.style.borderColor='#ff7f50'" onmouseout="this.style.borderColor='#1a1a1a'">
+            <div>
+                <div class="card-tag" style="color:#ff7f50;">Interactive Lab 08</div>
+                <h3>나만의 음악 취향<br>3x3 앨범 커버 제너레이터</h3>
+                <p>9장의 좋아하는 앨범 커버 이미지를 업로드하여 감각적인 3x3 비율의 프로필 사진을 렌더링하고 합성해 주는 실험기.</p>
+            </div>
+            <div class="card-footer" style="color:#ff7f50;">실험실 입장 <span>→</span></div>
+        </div>
+
+        <div class="card interactive" onclick="openModal('interactive_blockblast')" onmouseover="this.style.borderColor='#ff00ff'" onmouseout="this.style.borderColor='#1a1a1a'">
+            <div>
+                <div class="card-tag" style="color:#ff00ff;">Interactive Lab 09</div>
+                <h3>디지털 매트릭스 퍼즐<br>네온 블록 블라스트</h3>
+                <p>다양한 형태의 데이터 조각을 8x8 매트릭스 그리드에 드래그하여 맞추고 라인을 소거하는 공간 지각 논리 게임입니다.</p>
+            </div>
+            <div class="card-footer" style="color:#ff00ff;">실험실 입장 <span>→</span></div>
+        </div>
+    </main>
 
     <div id="projectModal" class="modal">
         <div class="modal-content">
@@ -153,18 +164,5 @@
     </div>
 
     <script src="projectsscript.js"></script>
-
-    <script>
-        function checkSecretCode() {
-            const code = prompt("SYSTEM: 암호를 입력하세요.");
-            
-            if (code === "welove67") {
-                alert("접속 승인! 비밀 구역으로 이동합니다.");
-                window.location.href = "reaction.html";
-            } else if (code !== null) {
-                alert("경고: 잘못된 접근입니다.");
-            }
-        }
-    </script>
 </body>
 </html>
