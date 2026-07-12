@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Official Store</title>
+    <!-- Chart.js 라이브러리 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* 기본 설정 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #ffffff;
+            color: #333;
+            overflow-x: hidden;
+        }
+        :root {
+            --chelsea-blue: #034694;
+            --chelsea-navy: #001489;
+            --light-gray: #f5f5f5;
+            --border-color: #ccc;
+        }
+
+        /* ---------------- 0. 시작 화면 (오버레이) ---------------- */
+        #start-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease;
+        }
+        .start-btn {
+            background-color: var(--chelsea-blue); color: #ffffff; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 15px 60px; font-size: 24px; /* 시작 버튼 고정 크기 */
+        }
+        .start-btn:hover { background-color: var(--chelsea-navy); }
+
+        /* ---------------- 네비게이션 & 공통 ---------------- */
+        .header-content { background-color: #fff; padding: 2px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--chelsea-blue); }
+        .logo-container { display: flex; align-items: center; }
+        .logo-img { height: 67px; cursor: pointer; margin-right: 10px; }
+        .logo-subtitle { font-size: 11px; color: #666; margin-top: -5px; }
+        .search-container { flex: 1; margin: 0 40px; display: flex; justify-content: center; }
+        .search-input { width: 100%; max-width: 500px; padding: 12px 20px; border: 1px solid #ddd; border-radius: 25px; font-size: 14px; }
+        .header-actions { display: flex; align-items: center; }
+        .cart-icon { color: #333; cursor: pointer; font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .cart-badge { background-color: var(--chelsea-blue); color: #fff; border-radius: 50%; padding: 2px 8px; font-size: 12px; }
+        .promo-bar { background-color: #f8f8f8; color: #333; text-align: center; padding: 8px 0; font-size: 12px; letter-spacing: 1px; }
+        .view-section { display: none; min-height: 80vh; }
+        .view-section.active { display: block; }
+
+        /* ---------------- 1. 홈 화면 (Hero) ---------------- */
+        .hero-banner { width: 100%; height: 750px; background-size: cover; background-position: center top; display: flex; flex-direction: column; justify-content: flex-end; color: #fff; position: relative; background-color: #111; }
+        .hero-text-overlay { width: 100%; padding: 50px 40px; background-image: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.8)); display: flex; justify-content: space-between; align-items: flex-end; }
+        .hero-title-group { max-width: 400px; }
+        .hero-title { font-size: 42px; font-weight: 900; margin-bottom: 5px; }
+        .hero-subtitle { font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+        .shop-now-btn { background-color: #fff; color: #111; font-weight: bold; border: none; border-radius: 25px; cursor: pointer; text-transform: uppercase; padding: 15px 40px; font-size: 16px; transition: 0.2s;}
+        .btn-blue { background-color: var(--chelsea-blue) !important; color: #fff !important; }
+        .btn-blue:hover { background-color: var(--chelsea-navy) !important; }
+
+        /* ---------------- 2. 상품 상세 화면 ---------------- */
+        .product-container { max-width: 1100px; margin: 60px auto; padding: 50px; display: flex; gap: 50px; border: 2px solid rgba(0, 0, 0, 0.15); border-radius: 12px; background-color: transparent; }
+        .product-gallery { flex: 1; background-color: var(--light-gray); display: flex; justify-content: center; align-items: center; padding: 40px; border-radius: 8px; }
+        .product-gallery img { max-width: 100%; }
+        .product-details { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .product-title { font-size: 32px; margin-bottom: 15px; }
+        .product-price { font-size: 26px; font-weight: bold; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #ddd; }
+        .add-to-cart-btn { width: 100%; background-color: var(--chelsea-blue); color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; padding: 18px; font-size: 16px; transition: 0.2s;}
+
+        /* ---------------- 3. 장바구니 화면 ---------------- */
+        .cart-container { max-width: 1000px; margin: 60px auto; padding: 0 20px; }
+        .cart-header { font-size: 32px; margin-bottom: 30px; border-bottom: 2px solid #111; padding-bottom: 10px; }
+        .cart-content { display: flex; gap: 40px; }
+        .cart-items { flex: 2; }
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #ddd; }
+        .item-info { display: flex; align-items: center; gap: 20px; }
+        .item-img { width: 80px; height: 80px; background-color: var(--light-gray); display: flex; justify-content: center; align-items: center; border-radius: 4px; }
+        .item-img img { max-width: 100%; }
+        .cart-summary { flex: 1; background-color: var(--light-gray); padding: 30px; height: fit-content; border-radius: 8px; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .summary-total { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid #ccc; font-weight: bold; font-size: 20px; }
+        .checkout-btn { width: 100%; background-color: #111; color: #fff; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; border-radius: 4px; padding: 18px; font-size: 16px; transition: 0.2s;}
+
+        /* ---------------- 4. 결제 화면 ---------------- */
+        .checkout-wrapper { max-width: 600px; margin: 60px auto; padding: 0 20px; border: 1px solid rgba(0,0,0,0.1); padding: 40px; border-radius: 12px; }
+        .checkout-title { font-size: 22px; margin-bottom: 10px; }
+        .terms-text { font-size: 12px; color: #555; margin-bottom: 20px; }
+        .terms-text a { color: var(--chelsea-blue); text-decoration: underline; }
+        .express-checkout { display: flex; gap: 15px; margin-bottom: 30px; }
+        .btn-paypal { flex: 1; background-color: #0070ba; color: #fff; padding: 12px; border-radius: 25px; border: none; font-size: 16px; font-weight: bold; font-style: italic; cursor: pointer; }
+        .form-section { margin-bottom: 25px; }
+        .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .form-header h3 { font-size: 18px; }
+        .form-header a { font-size: 14px; color: #333; text-decoration: underline; }
+        .input-field { width: 100%; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 15px; font-size: 14px; }
+        .input-row { display: flex; gap: 15px; }
+        .continue-checkout-btn { width: 100%; background-color: #222; color: #fff; border: none; font-weight: bold; border-radius: 4px; cursor: pointer; margin-bottom: 10px; padding: 16px; font-size: 16px; transition: 0.2s;}
+
+        /* ---------------- 5. 결제 완료 화면 ---------------- */
+        .success-container { text-align: center; padding: 120px 20px; }
+        .success-icon { font-size: 80px; color: #27ae60; margin-bottom: 20px; }
+        .success-title { font-size: 36px; font-weight: bold; color: #111; margin-bottom: 15px; }
+        .success-text { font-size: 18px; color: #555; margin-bottom: 40px; }
+
+        /* ---------------- 6. 데이터 시각화 및 결과 화면 ---------------- */
+        .tracking-container { max-width: 900px; margin: 60px auto; padding: 40px; border: 2px solid rgba(0, 0, 0, 0.15); border-radius: 12px; background-color: transparent; }
+        .tracking-title { font-size: 28px; margin-bottom: 20px; text-align: center; }
+        
+        /* 산점도 그래프가 그려질 영역 */
+        .chart-wrapper { width: 100%; max-width: 700px; margin: 0 auto 40px auto; }
+        
+        .tracking-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .tracking-table th, .tracking-table td { border: 1px solid #ddd; padding: 12px; text-align: center; font-size: 14px; }
+        .tracking-table th { background-color: var(--chelsea-blue); color: white; }
+        .separator-row td { background-color: #f1f2f6; font-weight: bold; color: #555; } 
+
+        #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 4px; padding: 16px; position: fixed; z-index: 999; left: 50%; bottom: 30px; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
+        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+    </style>
+</head>
+<body style="overflow: hidden;"> 
+
+    <!-- 0. 메인 진입 전 시작 화면 -->
+    <div id="start-screen">
+        <button id="btn-start" class="start-btn" onclick="recordInteraction('시작', event, 'btn-start'); enterStore()">시작</button>
+    </div>
+
+    <!-- 헤더 -->
+    <header class="header-content" id="main-header">
+        <div class="logo-container">
+            <img src="로고.png" alt="Store Logo" class="logo-img">
+            <div><div class="logo-subtitle">OFFICIAL STORE</div></div>
+        </div>
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="여기에 검색어를 입력하세요">
+        </div>
+        <div class="header-actions">
+            <!-- 클릭 시 장바구니로 넘어가는 버튼 역할을 수행 -->
+            <div class="cart-icon" onclick="navigate('cart')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                <span class="cart-badge" id="header-cart-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="promo-bar" id="promo-bar">코드에 '잠신고야르'를 써서 67% 할인을 받으세요!</div>
+
+    <!-- 1. 홈 화면 -->
+    <section id="view-home" class="view-section active">
+        <div class="hero-banner" style="background-image: url('잠신고.jpg');">
+            <div class="hero-text-overlay">
+                <div class="hero-title-group">
+                    <h1 class="hero-title">지금 당장 구매하세요</h1>
+                    <p class="hero-subtitle">잠신고 홈킷 26/27</p>
+                </div>
+                <button id="btn-shop" class="shop-now-btn" onclick="recordInteraction('상품 목록', event, 'btn-shop'); navigate('product')">상품 목록</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. 상품 상세 화면 -->
+    <section id="view-product" class="view-section">
+        <div class="product-container">
+            <div class="product-gallery"><img src="유니폼.png" alt="첼시 유니폼"></div>
+            <div class="product-details">
+                <h1 class="product-title">잠신고 홈 어센틱 유니폼 2026-27</h1>
+                <div class="product-price">670,000 원</div>
+                <button id="btn-add-cart" class="add-to-cart-btn" onclick="recordInteraction('장바구니에 담기', event, 'btn-add-cart'); addToCart()">장바구니에 담기</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. 장바구니 화면 -->
+    <section id="view-cart" class="view-section">
+        <div class="cart-container">
+            <h1 class="cart-header">장바구니</h1>
+            <div class="cart-content">
+                <div class="cart-items" id="cart-items-container"></div>
+                <div class="cart-summary">
+                    <h3 style="margin-bottom: 20px;">구매 상품</h3>
+                    <div class="summary-row"><span>상품 금액</span><span id="summary-subtotal">0 원</span></div>
+                    <div class="summary-total"><span>총 결제금액</span><span id="summary-total">0 원</span></div>
+                    <button id="btn-purchase" class="checkout-btn" onclick="recordInteraction('구매', event, 'btn-purchase'); navigate('checkout')">구매</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. 결제 화면 -->
+    <section id="view-checkout" class="view-section">
+        <div class="checkout-wrapper">
+            <h2 class="checkout-title">결제하기</h2>
+            <p class="terms-text">결제를 함으로서, 당신은 우리의 이용약관 과 개인정보처리방침에 동의합니다.</p>
+            <div class="form-section">
+                <input type="email" class="input-field" placeholder="Email*" value="izdhfs@naver.com">
+            </div>
+            <div class="form-section">
+                <div class="input-row">
+                    <input type="text" class="input-field" placeholder="First Name*" value="도현">
+                    <input type="text" class="input-field" placeholder="Last Name*" value="김">
+                </div>
+                <input type="tel" class="input-field" placeholder="Phone*" value="010-4575-9676">
+                <input type="text" class="input-field" placeholder="Search Address*" value="잠신고등학교 1학년 1반 교실">
+            </div>
+            <button id="btn-confirm" class="continue-checkout-btn" onclick="recordInteraction('구매 확정', event, 'btn-confirm'); finalCheckout()">구매 확정</button>
+        </div>
+    </section>
+
+    <!-- 5. 결제 완료 화면 -->
+    <section id="view-success" class="view-section">
+        <div class="success-container">
+            <div class="success-icon">✔</div>
+            <h1 class="success-title">결제 완료입니다!</h1>
+            <p class="success-text">주문이 성공적으로 접수되었습니다. 상품이 곧 배송될 예정입니다.</p>
+            <button id="btn-return" class="shop-now-btn btn-blue" onclick="recordInteraction('결과 보기', event, 'btn-return'); showTrackingResult()">데이터 추적 결과 확인하기</button>
+        </div>
+    </section>
+
+    <!-- 6. 행동 추적 결과 및 누적 시각화 화면 -->
+    <section id="view-tracking" class="view-section">
+        <div class="tracking-container">
+            <h2 class="tracking-title">행동 분석 결과 (누적 데이터)</h2>
+            
+            <!-- 산점도 그래프가 그려질 영역 -->
+            <div class="chart-wrapper">
+                <canvas id="scatterChart"></canvas>
+            </div>
+
+            <table class="tracking-table">
+                <thead>
+                    <tr>
+                        <th>클릭한 버튼</th>
+                        <th>소요 시간 (s)</th>
+                        <th>거리 / 크기 비율</th>
+                        <th>상세 수치 (거리, 크기)</th>
+                    </tr>
+                </thead>
+                <tbody id="tracking-tbody"></tbody>
+            </table>
+            
+            <div style="display: flex; justify-content: center; gap: 15px;">
+                <button class="shop-now-btn btn-blue" onclick="exportToCSV()">엑셀(CSV)로 일괄 다운로드</button>
+                <button class="shop-now-btn" style="border: 2px solid #ccc;" onclick="restartProcess()">다시 측정하여 데이터 누적하기</button>
+            </div>
+        </div>
+    </section>
+
+    <div id="toast">알림 메시지</div>
+
+    <script>
+        const PRODUCT_PRICE = 670000;
+        let cartQuantity = 0;
+        
+        let lastClickTime = null; 
+        let trackingData = [];
+        let lastX = null;
+        let lastY = null;
+        
+        let scatterChart = null;
+
+        // 시작 버튼(btn-start)과 결과 보기 버튼(btn-return)을 제외한 나머지 버튼들만 크기 무작위 변경
+        function randomizeButtons() {
+            const targetButtons = ['btn-shop', 'btn-add-cart', 'btn-purchase', 'btn-confirm'];
+            targetButtons.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    // 크기 스케일 (0.2 ~ 1.5 수준 유지)
+                    const randomScale = 0.2 + Math.random() * 1.3; 
+                    const basePaddingX = 20; 
+                    const basePaddingY = 15;
+                    const baseFontSize = 16;
+                    
+                    btn.style.padding = `${basePaddingY * randomScale}px ${basePaddingX * randomScale}px`;
+                    btn.style.fontSize = `${Math.max(10, baseFontSize * randomScale)}px`;
+                    
+                    // 좌표 이동(transform) 제거 (제자리에서 크기만 변경되도록 설정)
+                    btn.style.transform = 'none';
+                }
+            });
+        }
+
+        window.onload = randomizeButtons;
+
+        function recordInteraction(actionName, event, buttonId) {
+            let currentTime = new Date().getTime();
+            let intervalTime = 0;
+            let distance = 0;
+
+            if (lastClickTime !== null) {
+                intervalTime = (currentTime - lastClickTime) / 1000; 
+            }
+            lastClickTime = currentTime; 
+
+            if (lastX !== null && lastY !== null) {
+                distance = Math.sqrt(Math.pow(event.clientX - lastX, 2) + Math.pow(event.clientY - lastY, 2));
+            }
+
+            lastX = event.clientX;
+            lastY = event.clientY;
+
+            let btnWidth = 0;
+            let btnHeight = 0;
+            if (buttonId) {
+                let btn = document.getElementById(buttonId);
+                if (btn) {
+                    btnWidth = btn.offsetWidth;
+                    btnHeight = btn.offsetHeight;
+                }
+            }
+
+            // 거리 / 크기 비율 계산 (버튼의 가로 너비를 기준으로 산정)
+            let ratio = 0;
+            if (btnWidth > 0 && distance > 0) {
+                ratio = distance / btnWidth;
+            }
+
+            trackingData.push({
+                action: actionName,
+                timeValue: intervalTime, 
+                distanceValue: distance,
+                widthValue: btnWidth,
+                heightValue: btnHeight,
+                ratioValue: ratio, // X축에 들어갈 값 (거리/크기)
+                isSeparator: false
+            });
+        }
+
+        function enterStore() {
+            const startScreen = document.getElementById('start-screen');
+            startScreen.style.opacity = '0';
+            setTimeout(() => {
+                startScreen.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 500);
+        }
+
+        function navigate(viewName) {
+            if (viewName === 'checkout' && cartQuantity === 0) {
+                showToast("장바구니가 비어 있습니다.");
+                return;
+            }
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById('view-' + viewName).classList.add('active');
+            
+            if (viewName === 'cart') renderCart();
+            window.scrollTo(0, 0);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        // 장바구니에 담기 버튼
+        function addToCart() {
+            cartQuantity++;
+            document.getElementById('header-cart-count').innerText = cartQuantity;
+            showToast("상품이 장바구니에 추가되었습니다. 상단의 가방 아이콘을 눌러주세요.");
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            const subtotalEl = document.getElementById('summary-subtotal');
+            const totalEl = document.getElementById('summary-total');
+
+            if (cartQuantity === 0) {
+                container.innerHTML = '<div style="padding: 40px 0; color: #666;">장바구니가 비어 있습니다.</div>';
+                subtotalEl.innerText = '0 원';
+                totalEl.innerText = '0 원';
+            } else {
+                const totalPrice = PRODUCT_PRICE * cartQuantity;
+                container.innerHTML = `
+                    <div class="cart-item-row">
+                        <div class="item-info">
+                            <div class="item-img"><img src="유니폼.png" alt="상품"></div>
+                            <div>
+                                <div style="font-weight: bold; margin-bottom: 5px;">잠신고 홈 어센틱 유니폼 26-27</div>
+                                <div style="color: #666;">수량: ${cartQuantity}</div>
+                            </div>
+                        </div>
+                        <div style="font-weight: bold; font-size: 18px;">${totalPrice.toLocaleString()} 원</div>
+                    </div>
+                `;
+                subtotalEl.innerText = `${totalPrice.toLocaleString()} 원`;
+                totalEl.innerText = `${totalPrice.toLocaleString()} 원`;
+            }
+        }
+
+        function finalCheckout() {
+            cartQuantity = 0;
+            document.getElementById('header-cart-count').innerText = cartQuantity;
+            navigate('success');
+        }
+
+        // 전체 누적 데이터로 산점도(Scatter) 그래프 그리기
+        function drawScatterChart() {
+            const ctx = document.getElementById('scatterChart').getContext('2d');
+            
+            if (scatterChart !== null) {
+                scatterChart.destroy();
+            }
+
+            // 시작 버튼 등 소요시간이나 거리가 0인 데이터, 구분선은 필터링
+            const plotData = trackingData.filter(d => d.timeValue > 0 && d.ratioValue > 0 && !d.isSeparator).map(d => {
+                return {
+                    x: d.ratioValue, // X축: 거리 / 버튼 너비
+                    y: d.timeValue   // Y축: 소요 시간
+                };
+            });
+
+            scatterChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '클릭 데이터 점',
+                        data: plotData,
+                        backgroundColor: 'rgba(231, 76, 60, 0.7)', // 포인트 색상 (빨강 계열)
+                        borderColor: 'rgba(192, 57, 43, 1)',
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: { display: true, text: '거리 / 버튼 크기 비율 (Distance / Width)', font: { size: 14 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: '소요 시간 (Seconds)', font: { size: 14 } }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: '목표까지의 난이도 대비 소요 시간 산점도 (피츠의 법칙)',
+                            font: { size: 16 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function showTrackingResult() {
+            navigate('tracking'); 
+            const tbody = document.getElementById('tracking-tbody');
+            tbody.innerHTML = ''; 
+
+            trackingData.forEach(data => {
+                const row = document.createElement('tr');
+                
+                if (data.isSeparator) {
+                    row.className = "separator-row";
+                    row.innerHTML = `<td colspan="4">${data.action}</td>`;
+                } else {
+                    const ratioTxt = data.ratioValue > 0 ? data.ratioValue.toFixed(2) : "0.00";
+                    const distTxt = data.distanceValue > 0 ? data.distanceValue.toFixed(0) : "0";
+                    
+                    row.innerHTML = `
+                        <td style="font-weight: bold; color: #034694;">${data.action}</td>
+                        <td>${data.timeValue > 0 ? data.timeValue.toFixed(2) : "0.00"} 초</td>
+                        <td style="font-weight: bold;">${ratioTxt}</td>
+                        <td style="color: #666; font-size: 12px;">거리: ${distTxt}px<br>크기: ${data.widthValue}x${data.heightValue}</td>
+                    `;
+                }
+                tbody.appendChild(row);
+            });
+
+            // 누적된 데이터 전체를 바탕으로 산점도 갱신
+            drawScatterChart();
+        }
+
+        function exportToCSV() {
+            let csvContent = "\uFEFF"; 
+            csvContent += "클릭한 버튼,소요 시간(초),거리/크기 비율,이전 버튼과 거리(px),버튼 너비(px),버튼 높이(px)\n";
+
+            trackingData.forEach(function(row) {
+                if (row.isSeparator) {
+                    csvContent += `${row.action},,,,,\n`;
+                } else {
+                    const time = row.timeValue > 0 ? row.timeValue.toFixed(3) : 0;
+                    const ratio = row.ratioValue > 0 ? row.ratioValue.toFixed(3) : 0;
+                    const dist = row.distanceValue > 0 ? row.distanceValue.toFixed(3) : 0;
+                    
+                    csvContent += `${row.action},${time},${ratio},${dist},${row.widthValue},${row.heightValue}\n`;
+                }
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "누적_행동추적데이터.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function restartProcess() {
+            lastClickTime = null;
+            lastX = null;
+            lastY = null;
+
+            trackingData.push({
+                action: "--- 새로운 측정 시작 ---",
+                timeValue: 0,
+                distanceValue: 0,
+                widthValue: 0,
+                heightValue: 0,
+                ratioValue: 0,
+                isSeparator: true 
+            });
+
+            navigate('home');
+            
+            const startScreen = document.getElementById('start-screen');
+            startScreen.style.display = 'flex';
+            setTimeout(() => {
+                startScreen.style.opacity = '1';
+                document.body.style.overflow = 'hidden'; 
+            }, 10);
+
+            randomizeButtons();
+        }
+    </script>
+</body>
+</html>
